@@ -1,0 +1,100 @@
+---
+/**
+ * TocList — the table of contents of a long document (Terms and Conditions, Untitled 24:5603): a dot + a link
+ * to every section. Rendered as <nav aria-label> around a <ul>; every other attribute (data-toc-scroller, class)
+ * passes through to the <nav>. The current section is set by src/scripts/toc.ts (`is--active` +
+ * aria-current="location"); the first item starts active.
+ *   size  sm (desktop "Section navigation" 24:1306: Medium 14/130 % -1 %, Text Secondary at 70 %, items 20 apart;
+ *            the current one SemiBold 15, underlined, Text Primary)
+ *         lg (tablet "Table of Content" Opened 24:2484 and the mobile menu 24:5506: Medium 18/130 % -1 %,
+ *            items 32 apart; the current one Text Primary at 100 %)
+ * The dot (8, "Ellipse 2268") sits on the first line: 12 before the text, blue for the current section.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+type Props = HTMLAttributes<'nav'> & {
+  items: { id: string; title: string }[];
+  size?: 'sm' | 'lg';
+};
+
+const { items, size = 'sm', class: className, ...rest } = Astro.props;
+---
+
+<nav class:list={['toc-list', `size--${size}`, className]} {...rest}>
+  <ul class="toc-list_items">
+    {
+      items.map((item, index) => (
+        <li>
+          <a
+            href={`#${item.id}`}
+            class:list={['toc-list_link', index === 0 && 'is--active']}
+            aria-current={index === 0 ? 'location' : undefined}
+            data-toc-link
+          >
+            <span class="toc-list_dot" aria-hidden="true" />
+            <span class="toc-list_text">{item.title}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .toc-list_items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-20);
+  }
+  .toc-list.size--lg .toc-list_items {
+    gap: var(--size-32);
+  }
+  .toc-list_link {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--size-12);
+    color: var(--theme-text-secondary);
+    font-size: var(--size-14);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-text);
+    letter-spacing: var(--letter-spacing-text);
+    transition: color var(--transition-duration) var(--transition-easing);
+  }
+  .toc-list.size--lg .toc-list_link {
+    font-size: var(--size-18);
+  }
+  /* the dot is centred on the first line */
+  .toc-list_dot {
+    flex: none;
+    width: var(--size-8);
+    height: var(--size-8);
+    margin-top: calc((1lh - var(--size-8)) / 2);
+    border-radius: var(--radius-full);
+    background-color: var(--theme-toc-marker);
+    transition: background-color var(--transition-duration) var(--transition-easing);
+  }
+  .toc-list_text {
+    opacity: 0.7;
+    transition: opacity var(--transition-duration) var(--transition-easing);
+  }
+  .toc-list_link:hover,
+  .toc-list_link:focus-visible,
+  .toc-list_link.is--active {
+    color: var(--theme-text);
+  }
+  .toc-list_link:hover .toc-list_text,
+  .toc-list_link:focus-visible .toc-list_text,
+  .toc-list_link.is--active .toc-list_text {
+    opacity: 1;
+  }
+  .toc-list_link.is--active .toc-list_dot {
+    background-color: var(--theme-toc-marker-active);
+  }
+  .toc-list.size--sm .toc-list_link.is--active {
+    font-size: var(--size-15);
+    font-weight: var(--font-weight-semibold);
+  }
+  .toc-list.size--sm .toc-list_link.is--active .toc-list_text {
+    text-decoration: underline;
+  }
+</style>

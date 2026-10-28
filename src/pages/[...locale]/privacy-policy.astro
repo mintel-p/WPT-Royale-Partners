@@ -1,0 +1,35 @@
+---
+import ResponsibleGaming from '@/components/sections/ResponsibleGaming.astro';
+import SiteFooter from '@/components/sections/SiteFooter.astro';
+import SiteHeader from '@/components/sections/SiteHeader.astro';
+import TermsAgreement from '@/components/sections/TermsAgreement.astro';
+import TermsIntro from '@/components/sections/TermsIntro.astro';
+import { localeStaticPaths, localePath, useTranslations } from '@/i18n';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+export const getStaticPaths = localeStaticPaths;
+
+const locale = Astro.currentLocale;
+const dict = useTranslations(locale);
+const t = dict.pages.privacy;
+const { title, sections } = dict.privacy;
+---
+
+<BaseLayout
+  title={t.title}
+  description={t.description}
+  ogImage="/og/privacy-policy.jpg"
+  schema={{
+    breadcrumbs: [
+      { name: dict.terms.home, url: localePath('/', locale) },
+      { name: title, url: localePath('/privacy-policy/', locale) },
+    ],
+  }}
+  motion
+>
+  <SiteHeader slot="header" />
+  <TermsIntro title={title} />
+  <TermsAgreement title={title} sections={sections} />
+  <ResponsibleGaming />
+  <SiteFooter slot="footer" />
+</BaseLayout>

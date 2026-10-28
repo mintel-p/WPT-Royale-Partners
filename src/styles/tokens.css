@@ -1,0 +1,393 @@
+/*
+ * Design tokens — single source of truth for every visual value.
+ *
+ *   fluid scale  →  --size-N (primitives)  →  semantic tokens (--spacing-md, --font-h1 …)
+ *
+ * Semantic tokens are re-mapped per breakpoint at the bottom of this file
+ * (desktop-first, Webflow breakpoints: 991 / 767 / 479).
+ * Never hardcode a size or colour in a component when a token exists here.
+ *
+ * Synced from Figma (WPT-DEV, Desktop 0:225 + UI kit 0:20).
+ * Desktop frame 1440 + Tablet frame 2045:2016 (768) + Mobile frame 2053:3503 (390).
+ */
+
+:root {
+  color-scheme: dark; /* the whole page is dark: native scrollbars and controls follow */
+  /* ---------- Fluid scale ----------
+   * Every --size-N equals N/16 rem × --fluid-scale, so the whole layout scales
+   * proportionally with the viewport (like a zoomed Figma frame) and stops at --max.
+   *   --reference       design frame width for the current breakpoint (px, unitless)
+   *   --max             viewport width at which scaling stops (px, unitless)
+   *   --viewport-width  set at runtime by the inline script in BaseLayout.astro
+   *                     (clientWidth, excludes the scrollbar, capped at --max).
+   *                     Without JS it falls back to --reference → scale = 1.
+   */
+  --reference: 1440; /* Desktop frame 0:225 */
+  --max: 1440; /* wider screens: content stays 1440 in the centre, backgrounds stretch (frame "Full screen" 0:1517) */
+  --viewport-width: var(--reference);
+  --fluid-scale: calc(var(--viewport-width) / var(--reference));
+
+  /* ---------- Size primitives (name = px at scale 1) ---------- */
+  --size-1: 1px;
+  --size-2: 2px;
+  --size-4: calc(0.25rem * var(--fluid-scale));
+  --size-6: calc(0.375rem * var(--fluid-scale));
+  --size-8: calc(0.5rem * var(--fluid-scale));
+  --size-10: calc(0.625rem * var(--fluid-scale));
+  --size-12: calc(0.75rem * var(--fluid-scale));
+  --size-13: calc(0.8125rem * var(--fluid-scale));
+  --size-14: calc(0.875rem * var(--fluid-scale));
+  --size-15: calc(0.9375rem * var(--fluid-scale));
+  --size-16: calc(1rem * var(--fluid-scale));
+  --size-18: calc(1.125rem * var(--fluid-scale));
+  --size-20: calc(1.25rem * var(--fluid-scale));
+  --size-22: calc(1.375rem * var(--fluid-scale));
+  --size-24: calc(1.5rem * var(--fluid-scale));
+  --size-26: calc(1.625rem * var(--fluid-scale));
+  --size-28: calc(1.75rem * var(--fluid-scale));
+  --size-30: calc(1.875rem * var(--fluid-scale));
+  --size-32: calc(2rem * var(--fluid-scale));
+  --size-36: calc(2.25rem * var(--fluid-scale));
+  --size-40: calc(2.5rem * var(--fluid-scale));
+  --size-44: calc(2.75rem * var(--fluid-scale));
+  --size-48: calc(3rem * var(--fluid-scale));
+  --size-52: calc(3.25rem * var(--fluid-scale));
+  --size-56: calc(3.5rem * var(--fluid-scale));
+  --size-60: calc(3.75rem * var(--fluid-scale));
+  --size-64: calc(4rem * var(--fluid-scale));
+  --size-72: calc(4.5rem * var(--fluid-scale));
+  --size-80: calc(5rem * var(--fluid-scale));
+  --size-100: calc(6.25rem * var(--fluid-scale));
+  --size-120: calc(7.5rem * var(--fluid-scale));
+  --size-140: calc(8.75rem * var(--fluid-scale));
+  --size-160: calc(10rem * var(--fluid-scale));
+
+  /* ---------- Spacing (spacing-* classes, padding, margin) — auto-layout gaps of the desktop frame ---------- */
+  --spacing-tiny: var(--size-4); /* chip: check icon → label · 3 uses */
+  --spacing-xs: var(--size-8); /* card title → text, inline rows · 19 uses */
+  --spacing-sm: var(--size-10); /* nav-link, footer link rows · 11 uses */
+  --spacing-md: var(--size-16); /* button rows, faq list, header CTAs · 15 uses */
+  --spacing-lg: var(--size-20); /* card stacks, card grids, text blocks · 21 uses */
+  --spacing-xl: var(--size-32); /* content → buttons, nav menu, logo rows · 10 uses */
+  --spacing-2xl: var(--size-40); /* section header → content · 3 uses */
+  --spacing-3xl: var(--size-64); /* hero content → logos, footer rows · 2 uses */
+  --spacing-4xl: var(--size-80); /* footer brand → columns · 1 use (= container padding) */
+
+  /* ---------- Cards (ui/Card) ---------- */
+  --card-padding: var(--size-32); /* steps, benefits, commissions (tablet 28; benefits size--sm 24) */
+
+  /* ---------- Section, container, header ----------
+   * --header-height = the tallest header item (usually the logo) + header padding × 2.
+   * `.section--hero` uses it as the offset of the first section under the fixed header;
+   * sync-tokens updates the logo height per frame.
+   */
+  --section-padding-sm: var(--size-40); /* footer bottom · 1 use */
+  --section-padding-md: var(--size-80); /* sections 80/80, footer top · 7 uses */
+  --section-padding-lg: var(--size-140); /* hero text column 140/140 · 1 use */
+  --section-gap: 0px; /* between the sections: none on desktop and tablet, 40 on the mobile frame */
+  --container-padding: var(--size-80); /* Desktop frame side padding · every section */
+  --header-padding: var(--size-16); /* Header 80 tall, its tallest item (the logo, 48) centred */
+  --header-height: calc(var(--size-48) + var(--header-padding) * 2); /* = 80, Header frame */
+
+  /* ---------- 12-column grid: --col-N (desktop of 12), --t-col-N (tablet of 6), --m-col-N (mobile of 2) ----------
+   * --column-gap comes from the Figma `container width/Ncol` variables:
+   *   12 × col + 11 × gap = frame width − 2 × container padding
+   * (e.g. 1536 frame, padding 58, 5col = 580 → col 100, gap 20). sync-tokens derives it.
+   * Here: the three-card grids (how-it-works, benefits, commissions) — 3 × 413.33 + 2 × 20 = 1280.
+   */
+  --column-gap: var(--size-20);
+  --column-size: calc(
+    (
+        (var(--reference) / 16 * 1rem * var(--fluid-scale)) - (var(--container-padding) * 2) -
+          (var(--column-gap) * 11)
+      ) / 12
+  );
+  --col-1: var(--column-size);
+  --col-2: calc((var(--column-size) * 2) + var(--column-gap));
+  --col-3: calc((var(--column-size) * 3) + (var(--column-gap) * 2));
+  --col-4: calc((var(--column-size) * 4) + (var(--column-gap) * 3));
+  --col-5: calc((var(--column-size) * 5) + (var(--column-gap) * 4));
+  --col-6: calc((var(--column-size) * 6) + (var(--column-gap) * 5));
+  --col-7: calc((var(--column-size) * 7) + (var(--column-gap) * 6));
+  --col-8: calc((var(--column-size) * 8) + (var(--column-gap) * 7));
+  --col-9: calc((var(--column-size) * 9) + (var(--column-gap) * 8));
+  --col-10: calc((var(--column-size) * 10) + (var(--column-gap) * 9));
+  --col-11: calc((var(--column-size) * 11) + (var(--column-gap) * 10));
+  --col-12: calc((var(--column-size) * 12) + (var(--column-gap) * 11));
+  /* Tablet has 6 columns, mobile 2 — same formula, --column-size is re-computed below.
+   * Used by responsive width classes declared in components: .col-6\/3\/1 { width: var(--col-6) } …
+   * When the tablet Figma frame defines its own `container width/Ncol` variables (fixed column
+   * widths that do not follow the 6-column formula), sync-tokens overrides --t-col-N in the
+   * tablet media block with those values, e.g. --t-col-5: calc(36.25rem * var(--fluid-scale)). */
+  --t-col-1: var(--column-size);
+  --t-col-2: calc((var(--column-size) * 2) + var(--column-gap));
+  --t-col-3: calc((var(--column-size) * 3) + (var(--column-gap) * 2));
+  --t-col-4: calc((var(--column-size) * 4) + (var(--column-gap) * 3));
+  --t-col-5: calc((var(--column-size) * 5) + (var(--column-gap) * 4));
+  --t-col-6: calc((var(--column-size) * 6) + (var(--column-gap) * 5));
+  --m-col-1: var(--column-size);
+  --m-col-2: calc((var(--column-size) * 2) + var(--column-gap));
+
+  /* ---------- Typography: families ----------
+   * Client fonts are loaded with the Astro Fonts API (see astro.config.mjs) under the
+   * variables --font-primary-custom / --font-secondary-custom. Until they are configured,
+   * the system stacks below are used.
+   */
+  --font-primary: var(--font-primary-custom, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif); /* Poppins */
+  --font-secondary: var(--font-secondary-custom, Arial, sans-serif); /* Pathway Extreme Black Italic — step numbers only */
+
+  /* ---------- Typography: text styles (text-size-<name>) ----------
+   * One Figma text style = three tokens: --font-<name>, --line-height-<name>, --letter-spacing-<name>.
+   * Names = the Figma style names in kebab-case (H1, H2, H3, p, Text, nav, span, Button Text);
+   * unnamed styles get a role name (caption, caption-sb, label, number). Figma "auto" line height of
+   * Poppins = 1.5. Letter spacing in em (Figma % / 100, px / size).
+   */
+  /* Page default (body in base.css): Figma style "Text" — the most used body style. */
+  --font-default: var(--font-text);
+  --line-height-default: var(--line-height-text);
+  --letter-spacing-default: var(--letter-spacing-text);
+  --font-h1: var(--size-52); /* H1 · Poppins ExtraBold 52/110% -2% · 1 use */
+  --font-h2: var(--size-40); /* H2 · Poppins ExtraBold 40/115% -2% · 6 uses */
+  --font-h3: var(--size-20); /* H3 · Poppins ExtraBold 20/130% -1% · 16 uses */
+  --font-p: var(--size-18); /* p · Poppins Medium 18/140% -1% · 5 uses (leads) */
+  --font-text: var(--size-16); /* Text · Poppins Regular 16/130% -1% · 13 uses */
+  --font-nav: var(--size-14); /* nav · Poppins Medium 14/auto -1% · 11 uses */
+  --font-span: var(--size-14); /* span · Poppins Bold 14/auto +1.5px UPPERCASE · 5 uses (eyebrows) */
+  --font-button-text: var(--size-15); /* Button Text · Poppins Bold 15/100% · 13 uses (+ the underlined "Click here to apply") */
+  --font-caption: var(--size-13); /* unnamed · Poppins Regular 13/130% · 3 uses (responsible gaming, footer) */
+  --font-caption-sb: var(--size-13); /* unnamed · Poppins SemiBold 13 · 6 uses (Ontario chips, commission tags) */
+  --font-label: var(--size-12); /* unnamed · Poppins ExtraBold 12/auto +1px UPPERCASE · 2 uses (footer column titles) */
+  --font-number: var(--size-44); /* unnamed · Pathway Extreme Black Italic 44/100% · 3 uses (step numbers) */
+
+  /* ---------- Typography: weight, leading, tracking ---------- */
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extra-bold: 800;
+  --font-weight-black: 900;
+
+  --line-height-tiny: 0.8;
+  --line-height-xs: 0.9;
+  --line-height-sm: 1;
+  --line-height-md: 1.2;
+  --line-height-lg: 1.4;
+  --line-height-xl: 1.6;
+
+  --letter-spacing-normal: 0em;
+  --letter-spacing-wide: 0.01em;
+  --letter-spacing-tight-sm: -0.01em;
+  --letter-spacing-tight-md: -0.02em;
+  --letter-spacing-tight-lg: -0.03em;
+
+  /* per text style */
+  --line-height-h1: 1.1;
+  --line-height-h2: 1.15;
+  --line-height-h3: 1.3;
+  --line-height-p: 1.4;
+  --line-height-text: 1.3;
+  --line-height-nav: 1.5;
+  --line-height-span: 1.5;
+  --line-height-button-text: 1;
+  --line-height-caption: 1.3; /* merged: 130% kept, footer auto */
+  --line-height-caption-sb: 1.5; /* merged: chips auto (1.5) kept, tags 100% */
+  --line-height-label: 1.5;
+  --line-height-number: 1;
+
+  --letter-spacing-h1: var(--letter-spacing-tight-md);
+  --letter-spacing-h2: var(--letter-spacing-tight-md);
+  --letter-spacing-h3: var(--letter-spacing-tight-sm);
+  --letter-spacing-p: var(--letter-spacing-tight-sm);
+  --letter-spacing-text: var(--letter-spacing-tight-sm);
+  --letter-spacing-nav: var(--letter-spacing-tight-sm);
+  --letter-spacing-span: 0.1071em; /* 1.5px at 14 */
+  --letter-spacing-button-text: var(--letter-spacing-normal);
+  --letter-spacing-caption: var(--letter-spacing-normal);
+  --letter-spacing-caption-sb: var(--letter-spacing-tight-sm); /* merged: chips -1% kept, tags 0 */
+  --letter-spacing-label: 0.0833em; /* 1px at 12 */
+  --letter-spacing-number: var(--letter-spacing-normal);
+
+  /* ---------- Buttons (Figma components Huge Primary/Secondary button, Small Button) ---------- */
+  --button-padding-block: var(--size-14); /* 14 on every button */
+  --button-padding-inline: var(--size-32); /* Huge buttons */
+  --button-padding-inline-sm: var(--size-28); /* Small Button (header Login / Register) */
+
+  /* ---------- Motion: every transition/animation uses exactly these four ----------
+   * duration + easing: hover, focus, menus.  slow: reveal on scroll, hero intro.
+   * stagger: the delay step between staggered reveals (data-reveal="stagger", data-reveal-delay).
+   */
+  --transition-duration: 0.3s;
+  --transition-easing: cubic-bezier(0.33, 1, 0.68, 1); /* ease-out cubic */
+  --transition-duration-slow: 0.8s;
+  --transition-stagger: 0.1s;
+
+  /* ---------- Icons (icon-*) ---------- */
+  --icon-height-tiny: var(--size-8);
+  --icon-height-xs: var(--size-12); /* faq plus/minus bars 12 × 2 */
+  --icon-height-sm: var(--size-20); /* chip check icon */
+  --icon-height-md: var(--size-30);
+  --icon-height-lg: var(--size-40); /* faq toggle box */
+  --icon-height-xl: var(--size-48); /* logo in the header */
+  --icon-height-2xl: var(--size-56); /* benefit icons · 6 uses */
+  --icon-height-3xl: var(--size-72);
+
+  /* ---------- Shape ---------- */
+  --radius-xs: var(--size-6); /* regulator logo boxes · 2 uses */
+  --radius-sm: var(--size-12); /* faq toggle box · 4 uses */
+  --radius-md: var(--size-20); /* plus/minus bars, misc · 8 uses */
+  --radius-lg: var(--size-24); /* faq-item · 4 uses */
+  --radius-xl: var(--size-32); /* cards: steps, benefits, commissions, final CTA · 13 uses */
+  --radius-full: 999px; /* pills: buttons, tags, chips (Figma 999 / 99) */
+
+  --border-width-sm: 1.5px; /* card, faq, button strokes · 25 uses (hairline: does not scale) */
+  --border-width-md: var(--size-2);
+  --border-width-lg: var(--size-4);
+
+  /* ---------- Colours: swatches (raw palette) ----------
+   * Figma variables first (name in the comment), then the raw colours the design repeats.
+   */
+  --swatch-background: #020717; /* Background */
+  --swatch-text-primary: #f4f2f2; /* Text Primary */
+  --swatch-text-secondary: #b3b8c1; /* Text Secondary */
+  --swatch-text-tertiary: #8190ac; /* Tertiary — menu items */
+  --swatch-accent-yellow: #e2b25b; /* Accent Yellow */
+  --swatch-accent-blue: #014ed1; /* Accent Blue */
+  --swatch-border: rgb(30 46 74 / 0.4); /* Border Color (#1e2e4a 40%) */
+  --swatch-border-strong: rgb(30 46 74 / 0.6); /* #1e2e4a 60% — commission dividers, responsible gaming line · 4 uses */
+  --swatch-white: #ffffff;
+  --swatch-black: #000000;
+  --swatch-green: #009d20; /* primary button gradient end */
+  --swatch-green-dark: #005f17; /* primary button gradient start */
+  --swatch-green-bright: #00b826; /* primary button On Hower: gradient start, stroke (40% huge / 60% small) */
+  --swatch-green-deep: #006e1b; /* primary button On Hower gradient end (huge) */
+  --swatch-green-hover: #00891e; /* Small Button Filled On Hower fill */
+  --swatch-green-glow: #0ddf0a; /* primary button inner glow (huge) */
+  --swatch-blue-light: #5d92fd; /* secondary and ghost (Login) button On Hower stroke */
+  --swatch-red-light: #f05d5d; /* the error text */
+  --swatch-slate: #4e5667; /* secondary button stroke, chip stroke · 5 uses */
+  --swatch-grey-blue: #8e9bb4; /* card fill at 3%, faq toggle box at 10–15% */
+  --swatch-grey-light: #c1c7d6; /* faq plus/minus bars */
+  --swatch-navy: #040d29; /* faq-item fill (25%) */
+  --swatch-navy-line: #122041; /* faq divider, active faq stroke end */
+  --swatch-ink: #12192e; /* Ontario chip fill, check icon stroke · 6 uses */
+  --swatch-steel: #2b384f; /* Terms: the contents scroll indicator (thumb, track at 25%) · 2 uses */
+  --swatch-transparent: transparent;
+
+  /* ---------- Colours: theme (semantic — use these in components) ----------
+   * The whole page is dark: these are the values on the Background; `.theme--dark` / `.footer` in
+   * utilities.css repeat them. `alw` tokens keep their value everywhere.
+   */
+  --theme-page-bg: var(--swatch-background); /* the only page background; sections have none */
+  --theme-text: var(--swatch-text-primary); /* Text Primary · 35 uses */
+  --theme-text-secondary: var(--swatch-text-secondary); /* Text Secondary · 33 uses */
+  --theme-text-tertiary: var(--swatch-text-tertiary); /* Tertiary — the menu items (Menu 28:8990 / 34:13718) */
+  --theme-text-brand: var(--swatch-accent-yellow); /* Accent Yellow — eyebrows, footer titles, hover · 8 uses */
+  --theme-text-alw-brand: var(--swatch-accent-yellow);
+  --theme-text-inverse: var(--swatch-white); /* text on the blue tags and the chips · 6 uses */
+  --theme-text-error: var(--swatch-red-light); /* TODO: not in Figma (no forms) */
+  --theme-icon: var(--swatch-text-primary); /* Text Primary on icons */
+  --theme-icon-secondary: var(--swatch-text-secondary);
+  --theme-icon-brand: var(--swatch-accent-yellow); /* chip check circles · 3 uses */
+  --theme-border: var(--swatch-border); /* Border Color — cards, faq, dividers · 20 uses */
+  --theme-border-strong: var(--swatch-border-strong); /* dividers inside cards, the responsible gaming line */
+  --theme-card-border-brand: rgb(226 178 91 / 0.25); /* Accent Yellow 25% — step cards, active faq-item · 4 uses */
+  --theme-chip-bg: var(--swatch-ink); /* Ontario chips */
+  --theme-section-bg-light: var(--swatch-background);
+  --theme-section-bg-dark: var(--swatch-background); /* Background */
+  --theme-section-bg-brand: var(--swatch-accent-blue);
+  /* the navy tint over the Background: the footer, the tablet menu · 2 uses */
+  --theme-surface-tint: linear-gradient(rgb(4 13 41 / 0.2), rgb(14 45 143 / 0.2));
+  --theme-card-bg: rgb(142 155 180 / 0.03); /* #8e9bb4 3% — steps, benefits, commissions, final CTA · 10 uses */
+  --theme-card-bg-alw-white: var(--swatch-white);
+  --theme-card-bg-brand: var(--swatch-accent-blue); /* Accent Blue — the CPA / RevShare / Hybrid tags · 3 uses */
+  /* Buttons (Ui Kit 49:1136): primary = green gradient, hover + disabled differ between Huge and Small */
+  --theme-button-primary-bg: linear-gradient(109deg, var(--swatch-green-dark) 10.29%, var(--swatch-green) 105.38%); /* background-image */
+  --theme-button-primary-bg-disabled: linear-gradient(109deg, var(--swatch-green) 10.29%, var(--swatch-green-dark) 105.38%); /* Huge "Variant3" (+ 40 %) */
+  --theme-button-primary-text: var(--swatch-text-primary);
+  --theme-button-primary-glow: inset 0 0 25px rgb(13 223 10 / 0.25); /* Huge only */
+  --theme-button-primary-bg-hover: linear-gradient(107deg, var(--swatch-green-bright) 0.93%, var(--swatch-green-deep) 105.27%);
+  --theme-button-primary-border-hover: rgb(0 184 38 / 0.4);
+  --theme-button-primary-glow-hover: inset 0 0 20px rgb(13 223 10 / 0.4);
+  --theme-button-primary-bg-hover-sm: var(--swatch-green-hover);
+  --theme-button-primary-border-hover-sm: rgb(0 184 38 / 0.6);
+  --theme-button-secondary-border: var(--swatch-slate);
+  --theme-button-secondary-border-hover: var(--swatch-blue-light);
+  --theme-button-secondary-bg-hover: rgb(93 146 253 / 0.05); /* #5d92fd 5% */
+  --theme-input-bg: var(--swatch-navy); /* TODO: not in Figma (no forms) */
+  --theme-input-border: var(--swatch-slate); /* TODO: not in Figma (no forms) */
+  --theme-input-text: var(--swatch-text-secondary); /* TODO: not in Figma (no forms) */
+  --theme-illustration: var(--swatch-accent-blue); /* decorative glows and dot maps */
+  /* Terms (Untitled 24:5603): the table of contents */
+  --theme-toc-marker: var(--swatch-slate); /* inactive item dot (the Figma ellipse could not be exported: TODO check) */
+  --theme-toc-marker-active: var(--swatch-accent-blue); /* the current section's dot */
+  /* Menu (Untitled 38:1197): the item dots ("Ellipse 2268": Text Secondary 15 %, the current section Accent Blue)
+     and the page behind the tablet panel (36:1198: Background 40 % + blur) */
+  --theme-menu-marker: rgb(179 184 193 / 0.15);
+  --theme-menu-marker-active: var(--swatch-accent-blue);
+  --theme-menu-backdrop: rgb(2 7 23 / 0.4);
+  --theme-scrollbar-track: rgb(43 56 79 / 0.25); /* "slider" #2b384f 25% */
+  --theme-scrollbar-thumb: var(--swatch-steel);
+}
+
+/* ---------- Tablet (≤ 991px) ----------
+ * Tablet frame 2045:2016 (768). Only the values that differ from desktop; the rest is inherited.
+ */
+@media (max-width: 991px) {
+  :root {
+    --reference: 768;
+
+    --spacing-lg: var(--size-16); /* card grids, card stacks, footer columns */
+    --spacing-3xl: var(--size-48); /* hero content → logos, footer rows */
+    --spacing-4xl: var(--size-48); /* footer: logo → text, column → column */
+
+    --section-padding-sm: var(--size-32); /* footer bottom */
+    --section-padding-md: var(--size-56); /* sections 56/56, footer top */
+    --container-padding: var(--size-32);
+    --header-padding: calc(0.78125rem * var(--fluid-scale)); /* tablet-header 73: the 48 logo centred */
+
+    --card-padding: var(--size-28);
+
+    --font-h1: var(--size-40);
+    --font-h2: var(--size-32);
+    --font-caption: var(--size-12); /* responsible gaming, footer bottom */
+
+    --radius-xl: var(--size-24); /* cards */
+  }
+}
+
+/* ---------- Mobile (≤ 479px) ----------
+ * Mobile frame 2053:3503 (390). Only the values that differ from tablet; the rest is inherited.
+ * The page column is an auto-layout with gap 40 between the sections and the footer (--section-gap).
+ */
+@media (max-width: 479px) {
+  :root {
+    --reference: 390;
+
+    --spacing-2xl: var(--size-32); /* section header → content, ontario info → visual, faq header → list */
+
+    --section-padding-md: var(--size-40); /* sections 40/40 */
+    --section-gap: var(--size-40); /* between the sections and before the footer (.main, .wrapper) */
+    --container-padding: var(--size-16);
+    --header-padding: var(--size-14); /* mobile-header 64: the 36 logo centred */
+    --header-height: calc(var(--size-36) + var(--header-padding) * 2); /* = 64 */
+
+    --card-padding: var(--size-20);
+
+    --font-h1: var(--size-32);
+    --font-h2: var(--size-24);
+    --font-h3: var(--size-18);
+    --font-p: var(--size-16);
+    --font-text: var(--size-15);
+    --font-span: var(--size-13);
+    --font-label: calc(0.6875rem * var(--fluid-scale)); /* 11, footer column titles */
+    --font-number: var(--size-32);
+
+    --line-height-h2: 1.3;
+    --letter-spacing-span: 0.1154em; /* 1.5px at 13 */
+    --letter-spacing-label: 0.0909em; /* 1px at 11 */
+
+    --radius-lg: var(--size-20); /* faq-item */
+    --radius-xl: var(--size-20); /* cards */
+  }
+}

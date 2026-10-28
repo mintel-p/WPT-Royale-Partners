@@ -1,0 +1,262 @@
+---
+/**
+ * FinalCta — Figma Desktop 2064:2129 ("final-cta"): one card (ui/Card type="cta", 2064:2130) with the heading, the lead,
+ * two buttons and the affiliates e-mail, next to the WPT Royale chip ("coin_upd 2" 2003:14538 in the Untitled copy:
+ * a transparent PNG, the same image on all three breakpoints, saved at 2x of the desktop size). The card's background (the opaque rect with its
+ * gradient and inner shadow, the two blurred plus-lighter ellipses) is one picture exported from the card without its
+ * content, chip and top rays — CSS cannot reproduce the 250 / 320 layer blurs. The light rays ("c9e5208d…" 2064:2150,
+ * screen 52 %) are exported on black and lie over the content and the chip; their copy 2064:2131 is hidden under the
+ * card's opaque background rect in the frame, so it is not rendered.
+ * No top padding, 80 at the bottom.
+ * Tablet 2064:6069: the chip (frame 194 × 150) above the centred 580 column (chip → text 32, text → buttons 48,
+ * → e-mail 40); the card's background (fill, glows, two ray layers, star dust) is one picture exported from
+ * the frame without its content, so the desktop rays stay desktop-only.
+ * Mobile 2064:4737 (padding 40 / 0): card padding 24 / 20, the chip (frame 116.67 × 90) above the text (chip → text 24,
+ * title → lead 12, text → buttons 40, buttons → e-mail 32), the buttons one under the other across the column,
+ * the e-mail Bold 12; the card background is its own export (2064:4738 without its content). Each breakpoint shows only
+ * its own background picture (all lazy: the hidden ones are never downloaded).
+ */
+import { Picture } from 'astro:assets';
+import chip from '@/assets/final-cta/final-cta-chip.png';
+import background from '@/assets/final-cta/final-cta-background.jpg';
+import backgroundMobile from '@/assets/final-cta/final-cta-background-mobile.jpg';
+import backgroundTablet from '@/assets/final-cta/final-cta-background-tablet.jpg';
+import rays from '@/assets/final-cta/final-cta-rays.jpg';
+import Button from '@/components/ui/Button.astro';
+import Card from '@/components/ui/Card.astro';
+import { site } from '@/data/site';
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  title?: string;
+  text?: string;
+  cta?: string;
+  ctaHref?: string;
+  more?: string;
+  moreHref?: string;
+  emailLabel?: string;
+}
+
+const t = useTranslations(Astro.currentLocale).finalCta;
+const {
+  title = t.title,
+  text = t.text,
+  cta = t.cta,
+  ctaHref = site.signUpUrl,
+  more = t.more,
+  moreHref = '#faq',
+  emailLabel = t.emailLabel,
+} = Astro.props;
+---
+
+<section class="section padding-top-0/0/md padding-bottom-md/md/0" aria-labelledby="final-cta-title">
+  <div class="container">
+    <Card type="cta" data-reveal>
+      <div class="desktop-only">
+        <Picture src={background} formats={['avif', 'webp']} width={1280} sizes="(min-width: 1440px) 1280px, 88.89vw" alt="" class="final-cta_background" />
+      </div>
+      <div class="desktop-hide">
+        <div class="mobile-hide">
+          <Picture src={backgroundTablet} formats={['avif', 'webp']} width={704} sizes="91.67vw" alt="" class="final-cta_background" />
+        </div>
+        <div class="mobile-only">
+          <Picture src={backgroundMobile} formats={['avif', 'webp']} width={358} sizes="91.79vw" alt="" class="final-cta_background" />
+        </div>
+      </div>
+      <div class="final-cta_row spacing-20/32/24">
+        <div class="final-cta_info">
+          <div class="flex-v align-start/center/center spacing-56/40/32">
+            <div class="flex-v align-start/center/center spacing-32/48/40">
+              <div class="flex-v spacing-16/16/12 text-align-left/center/center">
+                <h2 class="text-size-h2 text-weight-800" id="final-cta-title">{title}</h2>
+                <p class="text-size-p text-weight-500 text-color-secondary">{text}</p>
+              </div>
+              <div class="flex-h/h/v spacing-md mob-width--100">
+                <Button href={ctaHref} target="_blank" rel="noopener noreferrer">{cta}</Button>
+                <Button variant="secondary" href={moreHref}>{more}</Button>
+              </div>
+            </div>
+            {
+              site.email && (
+                <address class="final-cta_contact">
+                  <p class="flex-h align-center spacing-xs">
+                    <span class="text-color-secondary">{emailLabel}</span>
+                    <span class="text-size-15/13/12 text-weight-700">
+                      <a class="final-cta_email" href={`mailto:${site.email}`}>
+                        {site.email}
+                      </a>
+                    </span>
+                  </p>
+                </address>
+              )
+            }
+          </div>
+        </div>
+        <div class="final-cta_visual">
+          <Picture src={chip} formats={['avif', 'webp']} width={379} sizes="(min-width: 1440px) 379px, (min-width: 992px) 26.32vw, (min-width: 480px) 27.99vw, 32.56vw" alt="" class="final-cta_chip" />
+        </div>
+      </div>
+      <div class="desktop-only">
+        <Picture src={rays} formats={['avif', 'webp']} width={590} sizes="(min-width: 1440px) 590px, 40.97vw" alt="" class="final-cta_rays" />
+      </div>
+    </Card>
+  </div>
+</section>
+
+<style>
+  .padding-top-0\/0\/md {
+    padding-top: 0;
+  }
+  .padding-bottom-md\/md\/0 {
+    padding-bottom: var(--section-padding-md);
+  }
+  .spacing-56\/40\/32 {
+    gap: var(--size-56);
+  }
+  .spacing-32\/48\/40 {
+    gap: var(--size-32);
+  }
+  .spacing-20\/32\/24 {
+    gap: var(--size-20);
+  }
+  .spacing-16\/16\/12 {
+    gap: var(--spacing-md);
+  }
+  /* the affiliates e-mail: Button Text 15 on desktop, Poppins Bold 13/100 % on tablet, 12/100 % on mobile */
+  .text-size-15\/13\/12 {
+    font-size: var(--font-button-text);
+    line-height: var(--line-height-button-text);
+    letter-spacing: var(--letter-spacing-button-text);
+  }
+  .final-cta_row {
+    display: flex;
+    align-items: center;
+  }
+  .final-cta_info {
+    flex: none;
+    width: calc(42.3125rem * var(--fluid-scale));
+  }
+  /* "Frame 2147259891" 472 × 303; "coin_upd 2" (379 × 305) sits at (78, 0) in it */
+  .final-cta_visual {
+    position: relative;
+    flex: none;
+    width: calc(29.5rem * var(--fluid-scale));
+    height: calc(18.9375rem * var(--fluid-scale));
+  }
+  .final-cta_chip {
+    position: absolute;
+    top: 0;
+    left: calc(4.875rem * var(--fluid-scale));
+    width: calc(23.6875rem * var(--fluid-scale));
+    max-width: none;
+    height: calc(19.0625rem * var(--fluid-scale));
+  }
+  /* the export covers the visible part of the rays: x 690 → 1280 of the card's outer box, full height */
+  .final-cta_rays {
+    position: absolute;
+    top: calc(var(--border-width-sm) * -1);
+    left: calc(43.125rem * var(--fluid-scale) - var(--border-width-sm));
+    z-index: 1;
+    width: calc(36.875rem * var(--fluid-scale));
+    max-width: none;
+    height: calc(27.6875rem * var(--fluid-scale));
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  /* the export covers the card's outer box (the border included), under the content */
+  .final-cta_background {
+    position: absolute;
+    top: calc(var(--border-width-sm) * -1);
+    left: calc(var(--border-width-sm) * -1);
+    z-index: -1;
+    width: calc(100% + var(--border-width-sm) * 2);
+    max-width: none;
+    height: calc(100% + var(--border-width-sm) * 2);
+    object-fit: cover;
+    pointer-events: none;
+  }
+  /* the UA draws <address> in italic */
+  .final-cta_contact {
+    font-style: normal;
+  }
+  /* the frame draws the address without an underline (base.css underlines links inside <p>) */
+  .final-cta_email {
+    text-decoration: none;
+    transition: color var(--transition-duration) var(--transition-easing);
+  }
+  .final-cta_email:hover,
+  .final-cta_email:focus-visible {
+    color: var(--theme-text-brand);
+  }
+
+  @media (max-width: 991px) {
+    .spacing-56\/40\/32 {
+      gap: var(--size-40);
+    }
+    .spacing-32\/48\/40 {
+      gap: var(--size-48);
+    }
+    .spacing-20\/32\/24 {
+      gap: var(--size-32);
+    }
+    .text-size-15\/13\/12 {
+      font-size: var(--size-13);
+    }
+    /* the decorative chip goes above the text */
+    .final-cta_row {
+      flex-direction: column-reverse;
+    }
+    .final-cta_info {
+      width: calc(36.25rem * var(--fluid-scale));
+    }
+    /* "Frame 2147259891" 194 × 150; "coin_upd 2" (215 × 173) sits at (-10.84, -11) in it */
+    .final-cta_visual {
+      width: calc(12.144rem * var(--fluid-scale));
+      height: calc(9.375rem * var(--fluid-scale));
+    }
+    .final-cta_chip {
+      top: calc(-0.6875rem * var(--fluid-scale));
+      left: calc(-0.6775rem * var(--fluid-scale));
+      width: calc(13.4375rem * var(--fluid-scale));
+      height: calc(10.8125rem * var(--fluid-scale));
+    }
+  }
+
+  @media (max-width: 479px) {
+    .padding-top-0\/0\/md {
+      padding-top: var(--section-padding-md);
+    }
+    .padding-bottom-md\/md\/0 {
+      padding-bottom: 0;
+    }
+    .spacing-56\/40\/32 {
+      gap: var(--size-32);
+    }
+    .spacing-32\/48\/40 {
+      gap: var(--size-40);
+    }
+    .spacing-20\/32\/24 {
+      gap: var(--size-24);
+    }
+    .spacing-16\/16\/12 {
+      gap: var(--size-12);
+    }
+    .text-size-15\/13\/12 {
+      font-size: var(--size-12);
+    }
+    .final-cta_info {
+      width: 100%;
+    }
+    /* "Frame 2147259891" 116.67 × 90; "coin_upd 2" (127 × 102) sits at (-5.67, -5.87) in it */
+    .final-cta_visual {
+      width: calc(7.2917rem * var(--fluid-scale));
+      height: calc(5.625rem * var(--fluid-scale));
+    }
+    .final-cta_chip {
+      top: calc(-0.367rem * var(--fluid-scale));
+      left: calc(-0.3543rem * var(--fluid-scale));
+      width: calc(7.9375rem * var(--fluid-scale));
+      height: calc(6.375rem * var(--fluid-scale));
+    }
+  }
+</style>

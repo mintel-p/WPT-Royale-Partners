@@ -1,0 +1,211 @@
+---
+/**
+ * Hero — Figma file kQ7O8pxSDMPnuAngiy1WC9, Desktop 45:1216 (640 under the 80 header): the content (602 wide) in the
+ * vertical centre at the left; on the right the "magnific" picture under the blurred "Star 2" mask (45:1252), exported
+ * with the mask on the page background (the mask's 179 blur cannot be drawn in CSS): 1130 × 858 from the frame's
+ * (458, −80), so it lies under the header, as in the frame, and fades out 138 below the hero (the slot clips only
+ * sideways). At the top-left the blue stripes ("Frame 2147259875", 0, −80: the stripes of ui/SectionGlow under their
+ * own mask, 453 × 595 from y −150, 70 % → 0 from the top), exported as hero-glow.svg (Figma drops the mask's 55 blur
+ * on export: restored). The wide frame "Full screen" 45:2494 adds the same stripes mirrored to the left of the column
+ * (45:3783), seen only on screens wider than 1440.
+ * Tablet 45:3809 (902 under the 73 header, padding 80 / 32): the 580 content column centred, the text and the button
+ * at the top, the regulator row at the bottom; the visual (mask 45:3811, 768 × 826 from y 134, exported over the 768
+ * frame) behind them; no stripes on tablet.
+ * Mobile 45:6511 (640 under the 64 header, padding 40 / 16): the same column across the width, the button and the
+ * regulator row stretched; the visual (mask 45:6513, 390 × 428 from y 225, exported over the 390 frame); the stripes
+ * are 45:6497 → hero-glow-sm.svg. The three visuals are one art-directed <picture> (a <source media> per
+ * breakpoint), so a device downloads only its own file.
+ */
+import { getImage, Image } from 'astro:assets';
+import heroGlow from '@/assets/decor/hero-glow.svg';
+import heroGlowSmall from '@/assets/decor/hero-glow-sm.svg';
+import heroVisual from '@/assets/hero/hero-visual.jpg';
+import heroVisualMobile from '@/assets/hero/hero-visual-mobile.jpg';
+import heroVisualTablet from '@/assets/hero/hero-visual-tablet.jpg';
+import Button from '@/components/ui/Button.astro';
+import ComplianceLogos from '@/components/ui/ComplianceLogos.astro';
+import { site } from '@/data/site';
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  title?: string;
+  text?: string;
+  cta?: string;
+  ctaHref?: string;
+}
+
+const t = useTranslations(Astro.currentLocale).hero;
+const { title = t.title, text = t.text, cta = t.cta, ctaHref = site.signUpUrl } = Astro.props;
+
+// <Picture> has no art direction: the sources are built here (constrained srcset of each file, avif + webp)
+const mobileMedia = '(max-width: 479px)';
+const tabletMedia = '(max-width: 991px)';
+const desktopSizes = '(min-width: 1440px) 1130px, 78.47vw';
+const formats = ['avif', 'webp'] as const;
+const sources = await Promise.all([
+  ...formats.map(async (format) => ({
+    media: mobileMedia,
+    type: `image/${format}`,
+    sizes: '100vw',
+    image: await getImage({ src: heroVisualMobile, width: 390, format }),
+  })),
+  ...formats.map(async (format) => ({
+    media: tabletMedia,
+    type: `image/${format}`,
+    sizes: '100vw',
+    image: await getImage({ src: heroVisualTablet, width: 768, format }),
+  })),
+  ...formats.map(async (format) => ({
+    media: undefined,
+    type: `image/${format}`,
+    sizes: desktopSizes,
+    image: await getImage({ src: heroVisual, width: 1130, format }),
+  })),
+]);
+const fallback = await getImage({ src: heroVisual, width: 1130 });
+---
+
+<section class="section section--hero" data-intro>
+  <div class="background-slot overflow-x-clip" aria-hidden="true">
+    <div class="container">
+      <div class="desktop-only">
+        <Image src={heroGlow} alt="" layout="none" class="hero_glow" />
+        <Image src={heroGlow} alt="" layout="none" class="hero_glow is--mirrored" />
+      </div>
+      <div class="mobile-only">
+        <Image src={heroGlowSmall} alt="" layout="none" class="hero_glow" />
+      </div>
+      <picture>
+        {sources.map((source) => <source media={source.media} type={source.type} srcset={source.image.srcSet.attribute} sizes={source.sizes} />)}
+        <img
+          src={fallback.src}
+          srcset={fallback.srcSet.attribute}
+          sizes={desktopSizes}
+          width={fallback.attributes.width}
+          height={fallback.attributes.height}
+          alt=""
+          class="hero_visual"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </picture>
+    </div>
+  </div>
+  <div class="container">
+    <div class="hero_body">
+      <div class="hero_content">
+        <div class="flex-v align-start/center/center spacing-32/24/24">
+          <div class="flex-v spacing-lg text-align-left/center/center">
+            <h1 class="text-size-h1 text-weight-800" data-reveal data-reveal-delay="1">{title}</h1>
+            <div class="text-size-p text-weight-500 text-color-secondary" data-reveal data-reveal-delay="2">
+              <p class="hero_text">{text}</p>
+            </div>
+          </div>
+          <div class="mob-width--100" data-reveal data-reveal-delay="3">
+            <Button href={ctaHref} target="_blank" rel="noopener noreferrer" class="mob-width--100">{cta}</Button>
+          </div>
+        </div>
+        <div class="mob-width--100" data-reveal data-reveal-delay="4">
+          <ComplianceLogos loading="eager" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* the stripes start at the page top (the frame's y −80 = the section's top), at the column's left edge;
+     458 × 501 with the stripe shadows */
+  .hero_glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(28.625rem * var(--fluid-scale));
+    max-width: none;
+    height: calc(31.3125rem * var(--fluid-scale));
+  }
+  /* "Full screen": the mirrored copy ends at the column's left edge */
+  .hero_glow.is--mirrored {
+    right: 100%;
+    left: auto;
+    scale: -1 1;
+  }
+  /* the visual from the frame's (458, −80) = the section's top */
+  .hero_visual {
+    position: absolute;
+    top: 0;
+    left: calc(28.625rem * var(--fluid-scale));
+    width: calc(70.625rem * var(--fluid-scale));
+    max-width: none;
+    height: calc(53.625rem * var(--fluid-scale));
+  }
+  /* Figma hero frame: 640 tall, content centred (127.5 above and below) */
+  .hero_body {
+    display: flex;
+    align-items: center;
+    min-height: calc(40rem * var(--fluid-scale));
+  }
+  .hero_content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--size-64);
+    width: calc(37.625rem * var(--fluid-scale));
+  }
+  .hero_text {
+    max-width: calc(30.75rem * var(--fluid-scale));
+  }
+  .spacing-32\/24\/24 {
+    gap: var(--size-32);
+  }
+
+  @media (max-width: 991px) {
+    /* the export covers the 768 frame from the hero's y 134 (+ the 73 header) */
+    .hero_visual {
+      top: calc(12.9375rem * var(--fluid-scale));
+      left: 0;
+      width: calc(48rem * var(--fluid-scale));
+      height: calc(51.625rem * var(--fluid-scale));
+    }
+    /* tablet hero frame: 902 tall, padding 80; the 580 column: text at the top, the logos at the bottom */
+    .hero_body {
+      flex-direction: column;
+      min-height: calc(56.375rem * var(--fluid-scale));
+      padding-block: var(--size-80);
+    }
+    .hero_content {
+      flex: 1;
+      align-items: center;
+      justify-content: space-between;
+      width: calc(36.25rem * var(--fluid-scale));
+    }
+    .hero_text {
+      max-width: none;
+    }
+    .spacing-32\/24\/24 {
+      gap: var(--size-24);
+    }
+  }
+
+  @media (max-width: 479px) {
+    /* 45:6497: 350 × 303 with the stripe shadows */
+    .hero_glow {
+      width: calc(21.89rem * var(--fluid-scale));
+      height: calc(18.926rem * var(--fluid-scale));
+    }
+    /* the export covers the 390 frame from the hero's y 225 (+ the 64 header) */
+    .hero_visual {
+      top: calc(18.0625rem * var(--fluid-scale));
+      width: calc(24.375rem * var(--fluid-scale));
+      height: calc(26.75rem * var(--fluid-scale));
+    }
+    /* mobile hero frame: 640 tall, padding 40, the column across the width */
+    .hero_body {
+      min-height: calc(40rem * var(--fluid-scale));
+      padding-block: var(--size-40);
+    }
+    .hero_content {
+      width: 100%;
+    }
+  }
+</style>

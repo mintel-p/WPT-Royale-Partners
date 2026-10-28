@@ -1,0 +1,60 @@
+---
+/**
+ * Tag — the two pills of the design.
+ *   brand  CPA / RevShare / Hybrid: Accent Blue, 24 tall, at least 84 wide (hugs the text on mobile), white SemiBold 13
+ *   chip   Ontario trust chips: dark pill with the yellow check icon, 36 tall
+ */
+import type { HTMLAttributes } from 'astro/types';
+import IconCheckCircle from '@/assets/icons/check-circle.svg';
+
+type Props = HTMLAttributes<'span'> & { type?: 'brand' | 'chip' };
+const { type = 'brand', class: className, ...rest } = Astro.props;
+---
+
+<span class:list={['tag', `type--${type}`, className]} {...rest}>
+  {type === 'chip' && <IconCheckCircle class="tag_icon" aria-hidden="true" />}
+  <slot />
+</span>
+
+<style>
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    color: var(--theme-text-inverse);
+    font-size: var(--font-caption-sb);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-caption-sb);
+    letter-spacing: var(--letter-spacing-caption-sb);
+    white-space: nowrap;
+  }
+  .tag.type--brand {
+    height: var(--size-24);
+    min-width: calc(5.25rem * var(--fluid-scale));
+    padding-inline: var(--spacing-sm);
+    background-color: var(--theme-card-bg-brand);
+  }
+  .tag.type--chip {
+    gap: var(--spacing-tiny);
+    height: calc(2.25rem * var(--fluid-scale));
+    padding: var(--size-2) var(--spacing-sm) var(--size-2) var(--size-2);
+    background-color: var(--theme-chip-bg);
+  }
+  /* tablet pills 2064:6021: a fixed 80 × 24 */
+  @media (max-width: 991px) {
+    .tag.type--brand {
+      min-width: calc(5rem * var(--fluid-scale));
+    }
+  }
+  @media (max-width: 479px) {
+    .tag.type--brand {
+      min-width: 0;
+    }
+  }
+  .tag_icon {
+    width: var(--size-32);
+    height: var(--size-32);
+    color: var(--theme-icon-brand);
+  }
+</style>

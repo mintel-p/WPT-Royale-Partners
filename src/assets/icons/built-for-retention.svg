@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" fill="none"><g clip-path="url(#built-for-retention-clip1)">
+<g>
+<mask id="built-for-retention-mask0" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="-1" width="56" height="57">
+<g>
+<path d="M56 0H0V56H56V0Z" fill="white" />
+<path d="M27.9992 2H15.8192C11.6108 2 8.19922 5.41159 8.19922 9.62V18.76C8.19922 22.9684 11.6108 26.38 15.8192 26.38H27.9992C32.2076 26.38 35.6192 22.9684 35.6192 18.76V9.62C35.6192 5.41159 32.2076 2 27.9992 2Z" fill="black" stroke="black" stroke-width="4.06" />
+<path d="M14.2891 23.23V30.74C14.2891 32.16 15.4091 32.67 16.4191 31.76L23.5291 25.26L14.2891 23.23Z" fill="black" stroke="black" stroke-width="4.06" stroke-linejoin="round" />
+</g>
+</mask>
+<g mask="url(#built-for-retention-mask0)">
+<g>
+<path d="M40.1809 5.0498H28.0009C23.7925 5.0498 20.3809 8.46139 20.3809 12.6698V18.6598C20.3809 22.8682 23.7925 26.2798 28.0009 26.2798H40.1809C44.3893 26.2798 47.8009 22.8682 47.8009 18.6598V12.6698C47.8009 8.46139 44.3893 5.0498 40.1809 5.0498Z" fill="url(#built-for-retention-paint0)" />
+<path d="M41.6109 23.2298V30.7398C41.6109 32.1598 40.4909 32.6698 39.4809 31.7598L32.3708 25.2598L41.6109 23.2298Z" fill="url(#built-for-retention-paint1)" />
+</g>
+</g>
+</g>
+<path d="M27.9992 2H15.8192C11.6108 2 8.19922 5.41159 8.19922 9.62V18.76C8.19922 22.9684 11.6108 26.38 15.8192 26.38H27.9992C32.2076 26.38 35.6192 22.9684 35.6192 18.76V9.62C35.6192 5.41159 32.2076 2 27.9992 2Z" fill="url(#built-for-retention-paint2)" />
+<path d="M14.2891 23.23V30.74C14.2891 32.16 15.4091 32.67 16.4191 31.76L23.5291 25.26L14.2891 23.23Z" fill="url(#built-for-retention-paint3)" />
+<path d="M21.91 2H28C32.2 2 35.62 5.41 35.62 9.62V18.76C35.62 22.96 32.2 26.38 28 26.38H21.91V2Z" fill="white" fill-opacity="0.12" />
+<path d="M17.4395 12.6601L20.3795 15.6101L26.4795 9.62012" stroke="url(#built-for-retention-paint4)" stroke-width="2.95" stroke-linecap="round" stroke-linejoin="round" />
+<path d="M11.0908 40.2299C13.5982 40.2299 15.6308 38.1973 15.6308 35.6899C15.6308 33.1825 13.5982 31.1499 11.0908 31.1499C8.58341 31.1499 6.55078 33.1825 6.55078 35.6899C6.55078 38.1973 8.58341 40.2299 11.0908 40.2299Z" fill="url(#built-for-retention-paint5)" />
+<path d="M2 46.28C2 42.92 5.36 40.19 8.09 40.19H14.09C17.45 40.19 20.18 42.92 20.18 46.28V52.78C20.18 53.45 19.63 54 18.96 54H3.22C2.55 54 2 53.45 2 52.78V46.28Z" fill="url(#built-for-retention-paint6)" />
+<path d="M44.8095 40.2299C47.3169 40.2299 49.3495 38.1973 49.3495 35.6899C49.3495 33.1825 47.3169 31.1499 44.8095 31.1499C42.3022 31.1499 40.2695 33.1825 40.2695 35.6899C40.2695 38.1973 42.3022 40.2299 44.8095 40.2299Z" fill="url(#built-for-retention-paint7)" />
+<path d="M35.7207 46.2799C35.7207 42.9199 39.0807 40.1899 41.8107 40.1899H47.8007C51.1707 40.1899 53.9007 42.9199 53.9007 46.2799V52.7799C53.9007 53.4499 53.3507 53.9999 52.6807 53.9999H36.9407C36.2607 53.9999 35.7207 53.4499 35.7207 52.7799V46.2799Z" fill="url(#built-for-retention-paint8)" />
+</g>
+<defs><clipPath id="built-for-retention-clip1">
+<rect width="56" height="56" fill="white" />
+</clipPath>
+<linearGradient id="built-for-retention-paint0" x1="20.3809" y1="-1.1502" x2="38.5609" y2="36.4298" gradientUnits="userSpaceOnUse">
+<stop stop-color="#8CB2FF" />
+<stop offset="0.460693" stop-color="#0051D7" />
+<stop offset="1" stop-color="#012D9F" />
+</linearGradient>
+<linearGradient id="built-for-retention-paint1" x1="20.3808" y1="-1.1502" x2="38.5608" y2="36.4298" gradientUnits="userSpaceOnUse">
+<stop stop-color="#8CB2FF" />
+<stop offset="0.460693" stop-color="#0051D7" />
+<stop offset="1" stop-color="#012D9F" />
+</linearGradient>
+<linearGradient id="built-for-retention-paint2" x1="8.19922" y1="-3.18" x2="24.3392" y2="35.41" gradientUnits="userSpaceOnUse">
+<stop stop-color="#ABC7FF" />
+<stop offset="0.460693" stop-color="#1F66DD" />
+<stop offset="1" stop-color="#0E3BB0" />
+</linearGradient>
+<linearGradient id="built-for-retention-paint3" x1="8.19906" y1="-3.18002" x2="24.3391" y2="35.41" gradientUnits="userSpaceOnUse">
+<stop stop-color="#ABC7FF" />
+<stop offset="0.460693" stop-color="#1F66DD" />
+<stop offset="1" stop-color="#0E3BB0" />
+</linearGradient>
+<linearGradient id="built-for-retention-paint4" x1="21.9095" y1="16.1201" x2="21.9095" y2="9.01012" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#C4B7A4" />
+</linearGradient>
+<linearGradient id="built-for-retention-paint5" x1="11.0908" y1="40.1899" x2="11.0908" y2="31.1499" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#C4B7A4" />
+</linearGradient>
+<linearGradient id="built-for-retention-paint6" x1="1.95" y1="33.38" x2="15.15" y2="57.76" gradientUnits="userSpaceOnUse">
+<stop stop-color="#8CB2FF" />
+<stop offset="0.460693" stop-color="#0051D7" />
+<stop offset="1" stop-color="#012D9F" />
+</linearGradient>
+<linearGradient id="built-for-retention-paint7" x1="44.8095" y1="40.1899" x2="44.8095" y2="31.1499" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#C4B7A4" />
+</linearGradient>
+<linearGradient id="built-for-retention-paint8" x1="35.6707" y1="33.3799" x2="48.8707" y2="57.7599" gradientUnits="userSpaceOnUse">
+<stop stop-color="#8CB2FF" />
+<stop offset="0.460693" stop-color="#0051D7" />
+<stop offset="1" stop-color="#012D9F" />
+</linearGradient>
+</defs></svg>

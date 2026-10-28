@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" fill="none"><g clip-path="url(#seamless-tracking-clip1)">
+<g>
+<mask id="seamless-tracking-mask0" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="56" height="56">
+<g>
+<path d="M56 0H0V56H56V0Z" fill="white" />
+<path d="M42.5004 55.0999C49.4592 55.0999 55.1004 49.4587 55.1004 42.4999C55.1004 35.5411 49.4592 29.8999 42.5004 29.8999C35.5416 29.8999 29.9004 35.5411 29.9004 42.4999C29.9004 49.4587 35.5416 55.0999 42.5004 55.0999Z" fill="black" />
+</g>
+</mask>
+<g mask="url(#seamless-tracking-mask0)">
+<g>
+<path d="M42.5 5H6.5C4.567 5 3 6.567 3 8.5V38.5C3 40.433 4.567 42 6.5 42H42.5C44.433 42 46 40.433 46 38.5V8.5C46 6.567 44.433 5 42.5 5Z" fill="url(#seamless-tracking-paint0)" />
+<path d="M24.5 5H42.5C44.433 5 46 6.567 46 8.5V38.5C46 40.433 44.433 42 42.5 42H24.5V5Z" fill="white" fill-opacity="0.12" />
+<g style="mix-blend-mode:multiply" opacity="0.6">
+<path d="M3 8.5C3 6.567 4.567 5 6.5 5H42.5C44.433 5 46 6.567 46 8.5V12H3V8.5Z" fill="url(#seamless-tracking-paint1)" />
+</g>
+<path d="M7.49961 9.9001C8.27281 9.9001 8.89961 9.2733 8.89961 8.5001C8.89961 7.7269 8.27281 7.1001 7.49961 7.1001C6.72641 7.1001 6.09961 7.7269 6.09961 8.5001C6.09961 9.2733 6.72641 9.9001 7.49961 9.9001Z" fill="url(#seamless-tracking-paint2)" />
+<path d="M11.4996 9.9001C12.2728 9.9001 12.8996 9.2733 12.8996 8.5001C12.8996 7.7269 12.2728 7.1001 11.4996 7.1001C10.7264 7.1001 10.0996 7.7269 10.0996 8.5001C10.0996 9.2733 10.7264 9.9001 11.4996 9.9001Z" fill="url(#seamless-tracking-paint3)" />
+<path d="M15.4996 9.9001C16.2728 9.9001 16.8996 9.2733 16.8996 8.5001C16.8996 7.7269 16.2728 7.1001 15.4996 7.1001C14.7264 7.1001 14.0996 7.7269 14.0996 8.5001C14.0996 9.2733 14.7264 9.9001 15.4996 9.9001Z" fill="url(#seamless-tracking-paint4)" />
+<path d="M9 34L17 25.5L24 30L37 17.5" stroke="url(#seamless-tracking-paint5)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+<path d="M8.99961 36.4001C10.3251 36.4001 11.3996 35.3256 11.3996 34.0001C11.3996 32.6746 10.3251 31.6001 8.99961 31.6001C7.67413 31.6001 6.59961 32.6746 6.59961 34.0001C6.59961 35.3256 7.67413 36.4001 8.99961 36.4001Z" fill="url(#seamless-tracking-paint6)" />
+<path d="M16.9996 27.9001C18.3251 27.9001 19.3996 26.8256 19.3996 25.5001C19.3996 24.1746 18.3251 23.1001 16.9996 23.1001C15.6741 23.1001 14.5996 24.1746 14.5996 25.5001C14.5996 26.8256 15.6741 27.9001 16.9996 27.9001Z" fill="url(#seamless-tracking-paint7)" />
+<path d="M23.9996 32.4001C25.3251 32.4001 26.3996 31.3256 26.3996 30.0001C26.3996 28.6746 25.3251 27.6001 23.9996 27.6001C22.6741 27.6001 21.5996 28.6746 21.5996 30.0001C21.5996 31.3256 22.6741 32.4001 23.9996 32.4001Z" fill="url(#seamless-tracking-paint8)" />
+<path d="M36.9996 19.9001C38.3251 19.9001 39.3996 18.8256 39.3996 17.5001C39.3996 16.1746 38.3251 15.1001 36.9996 15.1001C35.6741 15.1001 34.5996 16.1746 34.5996 17.5001C34.5996 18.8256 35.6741 19.9001 36.9996 19.9001Z" fill="url(#seamless-tracking-paint9)" />
+</g>
+</g>
+</g>
+<path d="M42.5 53.5C48.5751 53.5 53.5 48.5751 53.5 42.5C53.5 36.4249 48.5751 31.5 42.5 31.5C36.4249 31.5 31.5 36.4249 31.5 42.5C31.5 48.5751 36.4249 53.5 42.5 53.5Z" fill="url(#seamless-tracking-paint10)" />
+<path d="M42.5 31.5C45.4174 31.5 48.2153 32.6589 50.2782 34.7218C52.3411 36.7847 53.5 39.5826 53.5 42.5C53.5 45.4174 52.3411 48.2153 50.2782 50.2782C48.2153 52.3411 45.4174 53.5 42.5 53.5V31.5Z" fill="white" fill-opacity="0.12" />
+<path d="M42.5 47.5C45.2614 47.5 47.5 45.2614 47.5 42.5C47.5 39.7386 45.2614 37.5 42.5 37.5C39.7386 37.5 37.5 39.7386 37.5 42.5C37.5 45.2614 39.7386 47.5 42.5 47.5Z" stroke="url(#seamless-tracking-paint11)" stroke-width="2" />
+<path d="M42.5008 44.1998C43.4397 44.1998 44.2008 43.4387 44.2008 42.4998C44.2008 41.5609 43.4397 40.7998 42.5008 40.7998C41.5619 40.7998 40.8008 41.5609 40.8008 42.4998C40.8008 43.4387 41.5619 44.1998 42.5008 44.1998Z" fill="url(#seamless-tracking-paint12)" />
+<path d="M42.5 35.7V33.7" stroke="url(#seamless-tracking-paint13)" stroke-width="2" stroke-linecap="round" />
+<path d="M42.5 49.3V51.3" stroke="url(#seamless-tracking-paint14)" stroke-width="2" stroke-linecap="round" />
+<path d="M35.6992 42.5H33.6992" stroke="url(#seamless-tracking-paint15)" stroke-width="2" stroke-linecap="round" />
+<path d="M49.3008 42.5H51.3008" stroke="url(#seamless-tracking-paint16)" stroke-width="2" stroke-linecap="round" />
+</g>
+<defs><clipPath id="seamless-tracking-clip1">
+<rect width="56" height="56" fill="white" />
+</clipPath>
+<linearGradient id="seamless-tracking-paint0" x1="3" y1="-6" x2="28" y2="52" gradientUnits="userSpaceOnUse">
+<stop stop-color="#8CB2FF" />
+<stop offset="0.460693" stop-color="#0051D7" />
+<stop offset="1" stop-color="#012D9F" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint10" x1="31.5" y1="27.5" x2="45.5" y2="56.5" gradientUnits="userSpaceOnUse">
+<stop stop-color="#ABC7FF" />
+<stop offset="0.460693" stop-color="#1F66DD" />
+<stop offset="1" stop-color="#0E3BB0" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint11" x1="42.5" y1="51.5" x2="42.5" y2="33.5" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#F6EEE3" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint12" x1="42.5008" y1="51.4998" x2="42.5008" y2="33.4998" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#F6EEE3" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint13" x1="42.5" y1="51.5" x2="42.5" y2="33.5" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#F6EEE3" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint14" x1="42.5" y1="51.5" x2="42.5" y2="33.5" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#F6EEE3" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint15" x1="42.4992" y1="51.5" x2="42.4992" y2="33.5" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#F6EEE3" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint16" x1="42.5008" y1="51.5" x2="42.5008" y2="33.5" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#F6EEE3" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint1" x1="3" y1="8.5" x2="46" y2="8.5" gradientUnits="userSpaceOnUse">
+<stop stop-color="#262728" />
+<stop offset="1" stop-color="#262728" stop-opacity="0.3" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint2" x1="7.49961" y1="9.9001" x2="7.49961" y2="7.1001" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#F6EEE3" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint3" x1="11.4996" y1="9.9001" x2="11.4996" y2="7.1001" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#F6EEE3" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint4" x1="15.4996" y1="9.9001" x2="15.4996" y2="7.1001" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#F6EEE3" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint5" x1="9" y1="34" x2="37" y2="17.5" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#C4B7A4" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint6" x1="8.99961" y1="36.4001" x2="8.99961" y2="31.6001" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#F6EEE3" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint7" x1="16.9996" y1="27.9001" x2="16.9996" y2="23.1001" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#F6EEE3" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint8" x1="23.9996" y1="32.4001" x2="23.9996" y2="27.6001" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#F6EEE3" />
+</linearGradient>
+<linearGradient id="seamless-tracking-paint9" x1="36.9996" y1="19.9001" x2="36.9996" y2="15.1001" gradientUnits="userSpaceOnUse">
+<stop stop-color="white" />
+<stop offset="1" stop-color="#F6EEE3" />
+</linearGradient>
+</defs></svg>

@@ -1,0 +1,14 @@
+<svg width="1007.01" height="984.545" viewBox="0 0 1007.01 984.545" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#glow-10-blur)">
+<path d="M220 332.035C256 281.535 337.4 182.235 351 235.035C368 301.035 210 386.535 298.5 369.535C387 352.535 844.787 235.401 618.5 397.035C272 644.535 848.728 514.142 781.5 605.363C528.348 948.868 389.179 642.024 359.223 558.453C361.183 565.395 363.609 574.34 366.5 585.535C413.7 768.335 310.333 768.864 220 717.363V332.035Z" fill="url(#glow-10-gradient)" fill-opacity="0.1"/>
+</g>
+<defs>
+<filter id="glow-10-blur" x="0" y="0" width="1007.01" height="984.545" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feGaussianBlur stdDeviation="110"/>
+</filter>
+<linearGradient id="glow-10-gradient" x1="796.059" y1="446.437" x2="220" y2="446.437" gradientUnits="userSpaceOnUse">
+<stop stop-color="#5F0092"/>
+<stop offset="1" stop-color="#0B50FF"/>
+</linearGradient>
+</defs>
+</svg>

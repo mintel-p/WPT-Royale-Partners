@@ -1,0 +1,644 @@
+---
+/**
+ * TermsAgreement — the body of the Terms and Conditions page, Figma "Agreement and contents"
+ * (Untitled: desktop 24:1304, tablet "Legal agreement" 24:1931 + the "Table of Content" states 24:2477, mobile
+ * "Affiliate agreement" 24:740 + "Schedules and annexes" 24:1114). The text: `terms.sections` (src/i18n/en.terms.ts).
+ *
+ * Desktop: padding 48 / 80; the column starts at x 160 (the container's 80 + 80): the sticky table of contents
+ * (320, its visible part 453, the list fading out over 23 at the bottom, its own scroll indicator
+ * "slider" 5 × 169 at x 324 with a 3 × 48 thumb) → 80 → the document (720). Sections 64 apart, heading → clauses 24,
+ * clauses 16; headings ExtraBold 32/115 % -2 %, sub-headings (the DPA parts) H3, clauses Text (Regular 16/130 %).
+ * The blue "Floating Button" 24:1890 (40, a chevron up) takes the visitor back to the top; it stops at the end of the
+ * document (never over the footer). Tablet and mobile (the developer's request, no frame): the same button 12 above
+ * the contents bar, shown only while the visitor scrolls up (together with the header).
+ * Tablet: no sidebar; padding 48 / 80 at x 32 (704). The contents live in the bar at the bottom of the screen
+ * (Default 24:2478: 744 × 66, 12 from the edges, a fade above it: the group 109 tall) with the current section;
+ * the bar opens the panel (Opened 24:2484) under the header: "Table of Content" (24 ExtraBold) + a chevron up that
+ * closes it, the items (TocList lg), the scroll indicator 7 from the right edge.
+ * Mobile: padding 32 / 56 at x 16 (358); sections 40 apart, heading → clauses 20; headings 24/130 %, sub-headings 18,
+ * clauses 15. The same bar and panel as on tablet (the developer: the tablet states Scroll 24:2571 / Opened 24:3137
+ * apply to mobile too; no mobile frame, so the tablet sizes with the mobile container padding 16) (the header menu 24:5506
+ * does not repeat the contents: it gets the regular menu later).
+ * The open panel fills the whole screen under the header (the header is brought back if it was hidden).
+ *
+ * Props: `title` (the section's name) and `sections` — the Terms text by default; the Privacy Policy page passes
+ * `privacy.sections` (src/i18n/en.privacy.ts).
+ * Tables (the Privacy Policy, no Figma: drawn in the site's card style): a Border Color frame, radius 24 / 24 / 20, the
+ * card fill; the column titles in the footer-column label style (ExtraBold 12 uppercase, Accent Yellow), the row
+ * titles SemiBold Text Primary, the cells Text Secondary, rows split by Border Color lines. Mobile: the table keeps
+ * its columns and scrolls sideways inside the frame, the row titles stay pinned on the left.
+ *
+ * Deviations: the links are one style (Accent Yellow, SemiBold, underlined) — the Figma text mixes underlined and
+ * plain ones; the chevron is drawn by hand (the "20px / Back" icon could not be exported: TODO replace with the
+ * export); the floating button stays at 40 from the bottom of the screen until the document ends (the frame shows
+ * it 378 below the section top); no reveal on the document (42 000 px of text, jumps from the contents land on visible text).
+ */
+import IconChevron from '@/assets/icons/chevron.svg';
+import TocList from '@/components/ui/TocList.astro';
+import type { TermsBlock, TermsSection } from '@/i18n/en.terms';
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  title?: string;
+  sections?: TermsSection[];
+}
+
+const dict = useTranslations(Astro.currentLocale);
+const t = dict.terms;
+const { title = t.title, sections = t.sections } = Astro.props;
+const tocItems = sections.filter((section) => section.toc);
+// every section points at its entry of the contents (the DPA parts and the annexes at the last one before them)
+let tocId = tocItems[0]?.id ?? '';
+const withToc = sections.map((section) => {
+  if (section.toc) tocId = section.id;
+  return { ...section, tocId };
+});
+
+const escape = (text: string) =>
+  text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+// inline markup of the dictionary: **bold**, [text](href); links that leave the site open in a new tab
+const inline = (text: string) =>
+  escape(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[(.+?)\]\((.+?)\)/g, (_, label: string, href: string) =>
+      href.startsWith('http')
+        ? `<a href="${href}" target="_blank" rel="noopener noreferrer">${label}<span class="sr-only"> ${escape(dict.button.newTab)}</span></a>`
+        : `<a href="${href}">${label}</a>`,
+    );
+const isList = (block: TermsBlock): block is { terms: string[] } | { clauses: string[] } =>
+  typeof block !== 'string' && ('terms' in block || 'clauses' in block);
+const isTable = (block: TermsBlock): block is Extract<TermsBlock, { table: unknown }> =>
+  typeof block !== 'string' && 'table' in block;
+---
+
+<section class="section" aria-label={title}>
+  <div class="container">
+    <div class="terms-agreement_layout">
+      <div class="desktop-only">
+        <div class="terms-agreement_aside">
+          <TocList items={tocItems} aria-label={t.tocLabel} class="terms-agreement_toc" data-toc-scroller data-lenis-prevent />
+          <div class="terms-agreement_slider" aria-hidden="true">
+            <div class="terms-agreement_thumb" data-toc-thumb></div>
+          </div>
+        </div>
+      </div>
+      <div class="terms-agreement_document spacing-64/64/40 text-size-text">
+        {
+          withToc.map((section) => (
+            <section id={section.id} class="flex-v spacing-24/24/20" aria-labelledby={`${section.id}-title`} data-toc-section={section.tocId}>
+              {section.level === 2 ? (
+                <h2 id={`${section.id}-title`} class="text-size-32/32/24 text-weight-800 text-color-primary">
+                  {section.title}
+                </h2>
+              ) : (
+                <h3 id={`${section.id}-title`} class="text-size-h3 text-weight-800 text-color-primary">
+                  {section.title}
+                </h3>
+              )}
+              <div class="flex-v spacing-md text-color-secondary">
+                {section.blocks.map((block) =>
+                  typeof block === 'string' ? (
+                    <p set:html={inline(block)} />
+                  ) : isList(block) ? (
+                    'terms' in block ? (
+                      <ul class="flex-v spacing-md">
+                        {block.terms.map((item) => (
+                          <li set:html={inline(item)} />
+                        ))}
+                      </ul>
+                    ) : (
+                      <ul class="terms-agreement_clauses spacing-md">
+                        {block.clauses.map((item) => (
+                          <li set:html={inline(item)} />
+                        ))}
+                      </ul>
+                    )
+                  ) : isTable(block) ? (
+                    <div class="terms-agreement_table-frame">
+                      <table class="terms-agreement_table">
+                        <caption class="sr-only">{block.table.caption}</caption>
+                        <thead>
+                          <tr class="text-size-label text-weight-800 text-color-brand">
+                            {block.table.head.map((cell) => (
+                              <th scope="col">{cell}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {block.table.rows.map((row) => (
+                            <tr>
+                              {row.map((cell, index) =>
+                                index === 0 ? (
+                                  <th scope="row" class="text-weight-600 text-color-primary" set:html={inline(cell)} />
+                                ) : (
+                                  <td set:html={inline(cell)} />
+                                ),
+                              )}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <p class="text-weight-600 text-color-primary" set:html={inline(block.strong)} />
+                  ),
+                )}
+              </div>
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="desktop-hide">
+    <div class="terms-agreement_bar">
+      <button
+        type="button"
+        class="terms-agreement_bar-button text-weight-600 text-color-primary"
+        aria-expanded="false"
+        aria-controls="terms-toc-panel"
+        data-menu-toggle
+        data-toc-toggle
+      >
+        <span class="terms-agreement_dot" aria-hidden="true"></span>
+        <span class="terms-agreement_current text-size-18" data-toc-current>{tocItems[0]?.title}</span>
+        <span class="sr-only">{t.tocOpen}</span>
+        <IconChevron class="terms-agreement_bar-icon" aria-hidden="true" />
+      </button>
+    </div>
+    <div id="terms-toc-panel" class="terms-agreement_panel" tabindex="-1" data-toc-panel>
+      <div class="terms-agreement_panel-head">
+        <p class="text-size-24 text-weight-800 text-color-primary">{t.tocTitle}</p>
+        <button type="button" class="terms-agreement_close" aria-label={t.tocClose} data-toc-close>
+          <IconChevron class="terms-agreement_close-icon" aria-hidden="true" />
+        </button>
+      </div>
+      <div class="terms-agreement_panel-body">
+        <TocList items={tocItems} size="lg" aria-label={t.tocLabel} class="terms-agreement_panel-list" data-toc-scroller data-lenis-prevent />
+        <div class="terms-agreement_slider type--panel" aria-hidden="true">
+          <div class="terms-agreement_thumb" data-toc-thumb></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="terms-agreement_rail">
+    <a href="#main" class="terms-agreement_top" data-back-to-top>
+      <span class="sr-only">{t.backToTop}</span>
+      <IconChevron class="terms-agreement_top-icon" aria-hidden="true" />
+    </a>
+  </div>
+</section>
+
+<script>
+  import '@/scripts/toc';
+</script>
+
+<style>
+  .terms-agreement_layout {
+    display: flex;
+    gap: var(--size-80);
+    padding: var(--size-48) var(--size-80) var(--size-80);
+  }
+
+  /* ---------- the sidebar (desktop) ---------- */
+  /* a registered length, so the top fade of the list can transition */
+  @property --toc-fade-top {
+    syntax: '<length>';
+    inherits: false;
+    initial-value: 0px;
+  }
+  .terms-agreement_aside {
+    position: sticky;
+    top: calc(var(--header-height) + var(--size-48));
+    width: calc(20rem * var(--fluid-scale));
+  }
+  .terms-agreement_toc {
+    position: relative;
+    max-height: min(calc(28.3125rem * var(--fluid-scale)), calc(100dvh - var(--header-height) - var(--size-48) * 2));
+    padding-bottom: var(--size-24);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    /* the edges fade to transparent (a mask, so whatever lies behind — the intro's glow — shows through): 23 at the
+       bottom as in Figma; at the top (the developer's request) only once the list is scrolled (is--scrolled) */
+    mask-image: linear-gradient(
+      transparent,
+      #000 var(--toc-fade-top),
+      #000 calc(100% - 1.4375rem * var(--fluid-scale)),
+      transparent
+    );
+    transition: --toc-fade-top var(--transition-duration) var(--transition-easing);
+  }
+  .terms-agreement_toc.is--scrolled {
+    --toc-fade-top: calc(1.4375rem * var(--fluid-scale));
+  }
+  .terms-agreement_toc::-webkit-scrollbar {
+    display: none;
+  }
+  /* "slider": a 5 × 169 track 4 to the right of the contents, a 3 × 48 thumb (src/scripts/toc.ts moves it) */
+  .terms-agreement_slider {
+    position: absolute;
+    top: 0;
+    left: calc(100% + var(--size-4));
+    height: calc(10.5625rem * var(--fluid-scale));
+    padding: 1px;
+    border-radius: var(--radius-full);
+    background-color: var(--theme-scrollbar-track);
+    transition: opacity var(--transition-duration) var(--transition-easing);
+  }
+  .terms-agreement_slider.is--hidden {
+    opacity: 0;
+  }
+  .terms-agreement_thumb {
+    width: 3px;
+    height: var(--size-48);
+    border-radius: var(--radius-full);
+    background-color: var(--theme-scrollbar-thumb);
+  }
+
+  /* ---------- the document ---------- */
+  .terms-agreement_document {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .spacing-64\/64\/40 {
+    gap: var(--size-64);
+  }
+  .spacing-24\/24\/20 {
+    gap: var(--size-24);
+  }
+  /* headings: ExtraBold 32/115 % -2 % on desktop and tablet (the H2 style at 32), 24/130 % on mobile (the mobile H2) */
+  .text-size-32\/32\/24 {
+    font-size: var(--size-32);
+    line-height: var(--line-height-h2);
+    letter-spacing: var(--letter-spacing-h2);
+  }
+  .terms-agreement_document :global(strong) {
+    font-weight: var(--font-weight-semibold);
+  }
+  .terms-agreement_document :global(a) {
+    color: var(--theme-text-brand);
+    font-weight: var(--font-weight-semibold);
+    text-decoration: underline;
+    transition: color var(--transition-duration) var(--transition-easing);
+  }
+  .terms-agreement_document :global(a:hover),
+  .terms-agreement_document :global(a:focus-visible) {
+    color: var(--theme-text);
+  }
+  /* numbered sub-clauses: "• 6.3.1." — the bullet in SemiBold as in Figma */
+  .terms-agreement_clauses {
+    display: flex;
+    flex-direction: column;
+  }
+  .terms-agreement_clauses > li::before {
+    content: '• ';
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* ---------- tables ---------- */
+  .terms-agreement_table-frame {
+    overflow-x: auto;
+    border: var(--border-width-sm) solid var(--theme-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--theme-card-bg);
+    scrollbar-width: thin;
+    scrollbar-color: var(--theme-scrollbar-thumb) transparent;
+  }
+  .terms-agreement_table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    /* whole words: the document breaks anywhere (long URLs), a narrow column would split them */
+    overflow-wrap: normal;
+  }
+  .terms-agreement_table th,
+  .terms-agreement_table td {
+    padding: var(--size-20) var(--size-24);
+    vertical-align: top;
+  }
+  .terms-agreement_table thead th {
+    padding-block: var(--size-16);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .terms-agreement_table thead tr {
+    border-bottom: 1px solid var(--theme-border);
+  }
+  .terms-agreement_table tbody tr + tr {
+    border-top: 1px solid var(--theme-border);
+  }
+  /* the column widths: the row title, the examples (the widest), the source */
+  .terms-agreement_table th:nth-child(1) {
+    width: 28%;
+  }
+  .terms-agreement_table th:nth-child(3) {
+    width: 30%;
+  }
+
+  /* ---------- back to top ---------- */
+  /* The button sticks to the bottom of the screen while the document is on it and stops at the document's
+     last line (the rail = the section minus its bottom padding), never over the footer. Above the tablet
+     bar (z-index 9, earlier in the markup) with the same z-index. */
+  .terms-agreement_rail {
+    position: absolute;
+    top: 0;
+    right: calc((100% - var(--viewport-width) / 16 * 1rem) / 2 + 5.5rem * var(--fluid-scale));
+    bottom: 0;
+    z-index: 9;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: var(--size-80);
+    pointer-events: none;
+  }
+  .terms-agreement_top {
+    position: sticky;
+    bottom: var(--size-40);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--size-40);
+    height: var(--size-40);
+    border-radius: var(--radius-md);
+    background-color: var(--theme-card-bg-brand);
+    color: var(--theme-text);
+    pointer-events: auto;
+    transition:
+      scale var(--transition-duration) var(--transition-easing),
+      opacity var(--transition-duration) var(--transition-easing),
+      translate var(--transition-duration) var(--transition-easing),
+      visibility 0s linear;
+  }
+  /* no hover in Figma: the default for a coloured icon button */
+  .terms-agreement_top:hover,
+  .terms-agreement_top:focus-visible {
+    scale: 1.1;
+  }
+  .terms-agreement_top-icon {
+    width: var(--size-20);
+    height: var(--size-20);
+    rotate: 180deg;
+  }
+
+  /* ---------- the bar and the panel (tablet) ---------- */
+  .terms-agreement_bar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 9;
+    padding: calc(1.9375rem * var(--fluid-scale)) var(--size-12) var(--size-12);
+    background-image: linear-gradient(transparent, var(--theme-page-bg) 60%);
+    pointer-events: none;
+    /* the bar lies over the panel: it fades out while the panel grows from under it, and back in as the panel
+       shrinks into it */
+    transition: opacity var(--transition-duration) var(--transition-easing) calc(var(--transition-stagger) * 1.5);
+  }
+  .terms-agreement_bar:has([aria-expanded='true']) {
+    visibility: hidden;
+    opacity: 0;
+    transition:
+      opacity var(--transition-duration) var(--transition-easing),
+      visibility 0s linear var(--transition-duration);
+  }
+  .terms-agreement_bar-button {
+    display: flex;
+    align-items: center;
+    gap: var(--size-12);
+    width: 100%;
+    height: calc(4.125rem * var(--fluid-scale));
+    padding-inline: var(--size-24);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--radius-md);
+    background-color: var(--theme-page-bg);
+    background-image: linear-gradient(var(--theme-card-bg), var(--theme-card-bg));
+    text-align: left;
+    pointer-events: auto;
+    transition: border-color var(--transition-duration) var(--transition-easing);
+  }
+  .terms-agreement_bar-button:hover,
+  .terms-agreement_bar-button:focus-visible {
+    border-color: var(--theme-button-secondary-border);
+  }
+  .terms-agreement_dot {
+    flex: none;
+    width: var(--size-8);
+    height: var(--size-8);
+    border-radius: var(--radius-full);
+    background-color: var(--theme-toc-marker-active);
+  }
+  .terms-agreement_current {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* the current section in the bar: 18/130 % -1 % (the size of the panel items) */
+  .text-size-18 {
+    font-size: var(--size-18);
+    line-height: var(--line-height-text);
+    letter-spacing: var(--letter-spacing-text);
+  }
+  .terms-agreement_bar-icon {
+    flex: none;
+    width: var(--size-24);
+    height: var(--size-24);
+    color: var(--theme-icon-secondary);
+  }
+  /* The whole screen: the header (z-index 10) stays on top of the panel's solid background, the 1px line under it.
+     Open = the bar grows into the panel: the clip starts exactly on the bar (12 from the edges, 66 tall, its radius)
+     and opens to the screen edges (slow), then the head and the items come in one after another and the chevron
+     turns up. Close = the reverse, faster: the content fades out while the panel shrinks back into the bar. */
+  .terms-agreement_panel {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-24);
+    padding: calc(var(--header-height) + var(--size-24)) var(--container-padding) var(--size-24);
+    background-color: var(--theme-page-bg);
+    background-image: linear-gradient(var(--theme-card-bg), var(--theme-card-bg));
+    visibility: hidden;
+    clip-path: inset(
+      calc(100% - var(--size-12) - 4.125rem * var(--fluid-scale)) var(--size-12) var(--size-12) round var(--radius-md)
+    );
+    transition:
+      clip-path var(--transition-duration) var(--transition-easing),
+      visibility 0s linear var(--transition-duration);
+  }
+  .terms-agreement_panel::before {
+    content: '';
+    position: absolute;
+    top: var(--header-height);
+    right: 0;
+    left: 0;
+    border-top: 1px solid var(--theme-border);
+  }
+  .terms-agreement_panel.is--open {
+    visibility: visible;
+    clip-path: inset(0 0 0 0 round 0);
+    transition: clip-path var(--transition-duration-slow) var(--transition-easing);
+  }
+  /* the content: out at once on close, in one by one on open (head, then the first ten items, the rest together) */
+  .terms-agreement_panel-head,
+  .terms-agreement_panel-body :global(li),
+  .terms-agreement_slider.type--panel {
+    opacity: 0;
+    translate: 0 var(--size-16);
+    transition:
+      opacity var(--transition-duration) var(--transition-easing),
+      translate var(--transition-duration) var(--transition-easing);
+  }
+  .terms-agreement_panel.is--open .terms-agreement_panel-head,
+  .terms-agreement_panel.is--open .terms-agreement_panel-body :global(li),
+  .terms-agreement_panel.is--open .terms-agreement_slider.type--panel {
+    opacity: 1;
+    translate: none;
+    transition-duration: var(--transition-duration-slow);
+    transition-delay: calc(var(--transition-stagger) * 2);
+  }
+  .terms-agreement_panel.is--open .terms-agreement_slider.is--hidden {
+    opacity: 0;
+  }
+  .terms-agreement_panel.is--open .terms-agreement_panel-body :global(li) {
+    transition-delay: calc(var(--transition-stagger) * (2.5 + var(--toc-step, 10) * 0.5));
+  }
+  .terms-agreement_panel-body :global(li:nth-child(1)) { --toc-step: 1; }
+  .terms-agreement_panel-body :global(li:nth-child(2)) { --toc-step: 2; }
+  .terms-agreement_panel-body :global(li:nth-child(3)) { --toc-step: 3; }
+  .terms-agreement_panel-body :global(li:nth-child(4)) { --toc-step: 4; }
+  .terms-agreement_panel-body :global(li:nth-child(5)) { --toc-step: 5; }
+  .terms-agreement_panel-body :global(li:nth-child(6)) { --toc-step: 6; }
+  .terms-agreement_panel-body :global(li:nth-child(7)) { --toc-step: 7; }
+  .terms-agreement_panel-body :global(li:nth-child(8)) { --toc-step: 8; }
+  .terms-agreement_panel-body :global(li:nth-child(9)) { --toc-step: 9; }
+  .terms-agreement_panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-8);
+    padding-bottom: var(--size-16);
+  }
+  .text-size-24 {
+    font-size: var(--size-24);
+    line-height: var(--line-height-h2);
+    letter-spacing: var(--letter-spacing-h2);
+  }
+  .terms-agreement_close {
+    display: flex;
+    color: var(--theme-icon-brand);
+    transition: color var(--transition-duration) var(--transition-easing);
+  }
+  .terms-agreement_close:hover,
+  .terms-agreement_close:focus-visible {
+    color: var(--theme-icon);
+  }
+  /* the bar's chevron (down) turns up while the panel opens */
+  .terms-agreement_close-icon {
+    width: var(--size-24);
+    height: var(--size-24);
+    transition: rotate var(--transition-duration) var(--transition-easing);
+  }
+  .terms-agreement_panel.is--open .terms-agreement_close-icon {
+    rotate: 180deg;
+    transition-duration: var(--transition-duration-slow);
+    transition-delay: calc(var(--transition-stagger) * 2);
+  }
+  .terms-agreement_panel-body {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+  }
+  .terms-agreement_panel-list {
+    position: relative;
+    height: 100%;
+    padding-right: var(--size-24);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+  .terms-agreement_panel-list::-webkit-scrollbar {
+    display: none;
+  }
+  /* the panel's indicator: 7 from the panel's right edge (the body ends at the 32 padding) */
+  .terms-agreement_slider.type--panel {
+    left: auto;
+    right: calc(var(--container-padding) * -1 + calc(0.4375rem * var(--fluid-scale)));
+  }
+
+  @media (max-width: 991px) {
+    .terms-agreement_layout {
+      padding-inline: 0;
+    }
+    /* 12 from the screen edge, 12 above the contents bar (66 tall, 12 from the bottom); shown only while the
+       visitor scrolls up (is--visible, src/scripts/toc.ts) and never over the open contents panel */
+    .terms-agreement_rail {
+      right: var(--size-12);
+    }
+    .terms-agreement_top {
+      bottom: calc(var(--size-12) * 2 + 4.125rem * var(--fluid-scale));
+    }
+    .terms-agreement_top:not(.is--visible) {
+      visibility: hidden;
+      opacity: 0;
+      translate: 0 var(--size-16);
+      pointer-events: none;
+      transition:
+        scale var(--transition-duration) var(--transition-easing),
+        opacity var(--transition-duration) var(--transition-easing),
+        translate var(--transition-duration) var(--transition-easing),
+        visibility 0s linear var(--transition-duration);
+    }
+    :global(html:has([data-toc-toggle][aria-expanded='true'])) .terms-agreement_top {
+      visibility: hidden;
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 479px) {
+    /* the mobile page column already puts 40 (--section-gap) between the sections; the frame has 32 above the
+       document and 56 below it, with no gap between the sections: 40 − 8 = 32, 16 + 40 = 56 */
+    .terms-agreement_layout {
+      margin-top: calc(var(--size-8) * -1);
+      padding-block: 0 var(--size-16);
+    }
+    .terms-agreement_rail {
+      padding-bottom: var(--size-16);
+    }
+    .spacing-64\/64\/40 {
+      gap: var(--size-40);
+    }
+    .spacing-24\/24\/20 {
+      gap: var(--size-20);
+    }
+    .text-size-32\/32\/24 {
+      font-size: var(--font-h2);
+    }
+    /* the table keeps its columns and scrolls inside the frame; the row titles stay on the left (an opaque fill:
+       the page background under the card fill) */
+    .terms-agreement_table {
+      min-width: calc(37.5rem * var(--fluid-scale));
+    }
+    .terms-agreement_table th,
+    .terms-agreement_table td {
+      padding: var(--size-16);
+    }
+    .terms-agreement_table th:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      width: calc(8.75rem * var(--fluid-scale));
+      border-right: 1px solid var(--theme-border);
+      background-color: var(--theme-page-bg);
+      background-image: linear-gradient(var(--theme-card-bg), var(--theme-card-bg));
+    }
+  }
+</style>

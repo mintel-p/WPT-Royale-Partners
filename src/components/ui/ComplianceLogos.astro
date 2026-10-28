@@ -1,0 +1,82 @@
+---
+/**
+ * ComplianceLogos — the regulator row (AGCO · 19+ · ConnexOntario · iGaming Ontario) of the hero and the
+ * responsible gaming strip: four logos exported from Figma at 3x (masked rasters + vectors), 32 tall, with
+ * the 28-tall Border Color dividers between them. Images only, not links (the developer's decision):
+ * the row is one image for screen readers (role="img" + the dictionary alt).
+ *   type  default (gap 16 desktop, 20 tablet: hero 502 / 526) · stretch (responsible gaming: spread over the
+ *         whole column on tablet, compliance-row 2039:1842)
+ * Mobile (2064:3514, 2064:4760): the tablet row × 0.6875 — logos 22 tall, dividers 19.25, ~13.1 apart —
+ * spread over the 358 column in both places (the minimum gap 13 keeps the row inside the column).
+ */
+import { Image } from 'astro:assets';
+import type { HTMLAttributes } from 'astro/types';
+import agco from '@/assets/shared/compliance-agco.png';
+import nineteenPlus from '@/assets/shared/compliance-19-plus.png';
+import connexOntario from '@/assets/shared/compliance-connexontario.png';
+import iGamingOntario from '@/assets/shared/compliance-igaming-ontario.png';
+import { useTranslations } from '@/i18n';
+
+type Props = HTMLAttributes<'div'> & { type?: 'default' | 'stretch'; loading?: 'eager' | 'lazy' };
+const { type = 'default', loading = 'lazy', class: className, ...rest } = Astro.props;
+const t = useTranslations(Astro.currentLocale).complianceLogos;
+// 1x widths of the 32-tall logos
+const logos = [
+  { src: agco, width: 95 },
+  { src: nineteenPlus, width: 32 },
+  { src: connexOntario, width: 178 },
+  { src: iGamingOntario, width: 101 },
+];
+---
+
+<div class:list={['compliance-logos', type !== 'default' && `type--${type}`, className]} role="img" aria-label={t.alt} {...rest}>
+  {
+    logos.map((logo, index) => (
+      <>
+        {index > 0 && <span class="compliance-logos_divider" />}
+        <Image src={logo.src} width={logo.width} height={32} layout="fixed" alt="" loading={loading} class="compliance-logos_logo" />
+      </>
+    ))
+  }
+</div>
+
+<style>
+  .compliance-logos {
+    display: flex;
+    align-items: center;
+    gap: var(--size-16);
+  }
+  .compliance-logos_logo {
+    flex: none;
+    width: auto;
+    height: var(--size-32);
+  }
+  /* Figma draws a 0-wide line with a centred 1.5 stroke: it takes no room between the 16 gaps */
+  .compliance-logos_divider {
+    flex: none;
+    width: var(--border-width-sm);
+    height: var(--size-28);
+    margin-inline: calc(var(--border-width-sm) / -2);
+    background-color: var(--theme-border);
+  }
+  @media (max-width: 991px) {
+    .compliance-logos {
+      gap: var(--size-20);
+    }
+    .compliance-logos.type--stretch {
+      justify-content: space-between;
+    }
+  }
+  @media (max-width: 479px) {
+    .compliance-logos {
+      justify-content: space-between;
+      gap: calc(0.8125rem * var(--fluid-scale));
+    }
+    .compliance-logos_logo {
+      height: var(--size-22);
+    }
+    .compliance-logos_divider {
+      height: calc(1.203125rem * var(--fluid-scale));
+    }
+  }
+</style>

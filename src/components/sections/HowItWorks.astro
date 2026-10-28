@@ -1,0 +1,181 @@
+---
+/**
+ * HowItWorks — Figma Desktop 2064:933 ("how-it-works"): section header + three step cards (ui/Card type="step")
+ * with gold gradient numbers; the first card links to the sign-up page.
+ * Tablet 2045:2016: the cards stack (gap 16), 240 tall with the content centred; number → text 24, text → link 16;
+ * the mirrored blurred glow "Vector 8988" 2045:2059 (x 451, y 306, 567 wide → the picture 220 further out on
+ * every side) behind the right side, clipped by the section as in the frame.
+ * Mobile 2053:3551: cards 224 tall (padding 20) 12 apart, number → text 20, text → link 16; two mirrored blurred glows
+ * that cross the section edges (not clipped): "Vector 8988" 2053:3553 (300 × 280 at x −100, y 200, blur 220) and
+ * "Vector 8989" 2053:3552 (389.43 × 374 at x 108, y 758, blur 151) — each picture its blur further out on every side.
+ */
+import { Image } from 'astro:assets';
+import glow from '@/assets/decor/glow.svg';
+import glowXs from '@/assets/decor/glow-xs.svg';
+import glowXsWide from '@/assets/decor/glow-xs-wide.svg';
+import Card from '@/components/ui/Card.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import { site } from '@/data/site';
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  steps?: { title: string; text: string }[];
+  cta?: string;
+  ctaHref?: string;
+}
+
+const dict = useTranslations(Astro.currentLocale);
+const t = dict.howItWorks;
+const { eyebrow = t.eyebrow, title = t.title, steps = t.steps, cta = t.cta, ctaHref = site.signUpUrl } = Astro.props;
+---
+
+<section class="section padding-md" id="how-it-works" aria-labelledby="how-it-works-title">
+  <div class="background-slot overflow-hidden desktop-hide" aria-hidden="true">
+    <div class="container">
+      <div class="mobile-hide">
+        <Image src={glow} alt="" layout="none" class="how-it-works_glow" />
+      </div>
+    </div>
+  </div>
+  <div class="background-slot overflow-x-clip mobile-only" aria-hidden="true">
+    <div class="container">
+      <Image src={glowXs} alt="" layout="none" class="how-it-works_glow-top" />
+      <Image src={glowXsWide} alt="" layout="none" class="how-it-works_glow-bottom" />
+    </div>
+  </div>
+  <div class="container">
+    <div class="flex-v spacing-2xl">
+      <SectionHeader eyebrow={eyebrow} title={title} spacing="12" headingId="how-it-works-title" data-reveal />
+      <ol class="grid-3/1/1col spacing-20/16/12" data-reveal="stagger">
+        {
+          steps.map((step, index) => (
+            <Card type="step" element="li">
+              <div class="how-it-works_step spacing-20/24/20">
+                <p class="text-size-number text-weight-900 how-it-works_number" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </p>
+                <div class="flex-v align-start/center/center spacing-lg">
+                  <div class="flex-v spacing-xs text-align-left/center/center">
+                    <h3 class="text-size-h3 text-weight-800">{step.title}</h3>
+                    <p class="text-color-secondary how-it-works_text">{step.text}</p>
+                  </div>
+                  {index === 0 && (
+                    <p class="text-size-15/14/13 text-weight-700 text-color-brand">
+                      <a class="how-it-works_link" href={ctaHref} target="_blank" rel="noopener noreferrer">
+                        {cta}
+                        <span class="sr-only"> {dict.button.newTab}</span>
+                      </a>
+                    </p>
+                  )}
+                </div>
+              </div>
+            </Card>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .how-it-works_glow {
+    position: absolute;
+    top: calc(5.375rem * var(--fluid-scale));
+    left: calc(14.4375rem * var(--fluid-scale));
+    width: calc(63rem * var(--fluid-scale));
+    max-width: none;
+    height: calc(61.5625rem * var(--fluid-scale));
+    scale: -1 1;
+  }
+  /* mobile: 740 × 720 and 692 × 677 pictures, mirrored as the vectors */
+  .how-it-works_glow-top,
+  .how-it-works_glow-bottom {
+    position: absolute;
+    max-width: none;
+    scale: -1 1;
+  }
+  .how-it-works_glow-top {
+    top: calc(-1.25rem * var(--fluid-scale));
+    left: calc(-20rem * var(--fluid-scale));
+    width: calc(46.25rem * var(--fluid-scale));
+    height: calc(45rem * var(--fluid-scale));
+  }
+  .how-it-works_glow-bottom {
+    top: calc(37.9314rem * var(--fluid-scale));
+    left: calc(-2.6937rem * var(--fluid-scale));
+    width: calc(43.25rem * var(--fluid-scale));
+    height: calc(42.3125rem * var(--fluid-scale));
+  }
+  .spacing-20\/16\/12 {
+    gap: var(--size-20);
+  }
+  .how-it-works_step {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .spacing-20\/24\/20 {
+    gap: var(--size-20);
+  }
+  /* Figma "Gold": #fee38f → #e2b25b → #7b520d, top to bottom, clipped to the glyphs */
+  .how-it-works_number {
+    background-image: linear-gradient(180deg, #fee38f 9.615%, var(--swatch-accent-yellow) 46.635%, #7b520d 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* "Click here to apply": Poppins Bold 15 / 14 / 13, line height auto (23 / 21 / 20 in the frames) */
+  .text-size-15\/14\/13 {
+    font-size: var(--font-button-text);
+    line-height: 1.5;
+    letter-spacing: var(--letter-spacing-button-text);
+  }
+  .how-it-works_link {
+    text-decoration-thickness: from-font;
+    text-underline-position: from-font;
+    transition: color var(--transition-duration) var(--transition-easing);
+  }
+  .how-it-works_link:hover,
+  .how-it-works_link:focus-visible {
+    color: var(--theme-text);
+  }
+
+  @media (max-width: 991px) {
+    /* step-card: 240 tall (28 padding), the content centred */
+    .how-it-works_step {
+      align-items: center;
+      justify-content: center;
+      min-height: calc(11.5rem * var(--fluid-scale));
+    }
+    .spacing-20\/16\/12 {
+      gap: var(--size-16);
+    }
+    .spacing-20\/24\/20 {
+      gap: var(--size-24);
+    }
+    .how-it-works_text {
+      max-width: calc(23.875rem * var(--fluid-scale));
+    }
+    .text-size-15\/14\/13 {
+      font-size: var(--size-14);
+    }
+  }
+
+  @media (max-width: 479px) {
+    /* step-card: 224 tall (padding 20), the content centred, the text the full 318 */
+    .spacing-20\/16\/12 {
+      gap: var(--size-12);
+    }
+    .spacing-20\/24\/20 {
+      gap: var(--size-20);
+    }
+    .how-it-works_text {
+      max-width: none;
+    }
+    .text-size-15\/14\/13 {
+      font-size: var(--size-13);
+    }
+  }
+</style>

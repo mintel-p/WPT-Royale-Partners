@@ -1,0 +1,55 @@
+---
+/**
+ * SectionHeader — the repeated "section-header" frame: eyebrow (span, Accent Yellow, uppercase) + H2,
+ * and the lead (style p) passed in the slot by the section, because its width differs per section.
+ *   align  center (how-it-works, benefits, commissions) · start (ontario, faq: centred on tablet)
+ *   spacing  md (gap 16: benefits, ontario, commissions, faq) · 12 (how-it-works)
+ * Tablet: every section header is a centred 580 column (container width/5col of the tablet frame).
+ * Mobile: eyebrow → H2 is 12 in every section header (the lead stays 16 below), so the two sit in their own wrapper.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+type Props = HTMLAttributes<'div'> & {
+  eyebrow: string;
+  title: string;
+  align?: 'center' | 'start';
+  spacing?: 'md' | '12';
+  headingId?: string;
+};
+const { eyebrow, title, align = 'center', spacing = 'md', headingId, class: className, ...rest } = Astro.props;
+const gap = `spacing-${spacing}`;
+// eyebrow → title: the same as the header's gap on desktop and tablet, 12 on mobile
+const titleGap = spacing === '12' ? 'spacing-12' : 'spacing-16/16/12';
+const alignClass = align === 'center' ? 'align-center' : 'align-start/center/center';
+---
+
+<div class:list={['section-header', align === 'center' ? 'text-align-center' : 'text-align-left/center/center', className]} {...rest}>
+  <div class:list={['flex-v', alignClass, gap]}>
+    <div class:list={['flex-v', alignClass, titleGap]}>
+      <p class="text-size-span text-weight-700 text-color-brand"><span class="text-style-uppercase">{eyebrow}</span></p>
+      <h2 class="text-size-h2 text-weight-800" id={headingId}>{title}</h2>
+    </div>
+    <slot />
+  </div>
+</div>
+
+<style>
+  .spacing-12 {
+    gap: var(--size-12);
+  }
+  .spacing-16\/16\/12 {
+    gap: var(--spacing-md);
+  }
+  @media (max-width: 991px) {
+    .section-header {
+      width: 100%;
+      max-width: calc(36.25rem * var(--fluid-scale));
+      margin-inline: auto;
+    }
+  }
+  @media (max-width: 479px) {
+    .spacing-16\/16\/12 {
+      gap: var(--size-12);
+    }
+  }
+</style>

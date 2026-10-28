@@ -1,0 +1,229 @@
+---
+/**
+ * Benefits — Figma Desktop 0:306 ("benefits"): section header with a lead, six benefit cards (ui/Card)
+ * with their own gradient icons, and the sign-up button.
+ * Glows (one blurred vector — blur 220, #5f0092 → #0b50ff at 8 %, "Vector 8986" at 10 % — exported with its full
+ * blur margin, so each picture sits 220 above and left of the vector's box). They reach into the neighbouring
+ * sections as in the frames, so the slot clips only horizontally:
+ *   desktop  "Vector 8988" 0:307 (x 0, y 57), the page-level "Vector 8986" 0:1516 (x −25, y 812 of this section)
+ *            and the mirrored "Vector 8987" 0:226 (x 1015, y 757)
+ *   tablet   2045:2016: "Vector 8988" 2045:2091 (400 wide, x −172, y 526) and the page-level "Vector 8986"
+ *            2045:2017 (400 wide, x −25, y 35)
+ *   mobile   2053:3503: the page-level "Vector 8986" 2053:3504 (300 wide, 10 %, x −25, y 298)
+ * Tablet: two columns (gap 16), compact cards (padding 24, radius 20, text 14).
+ * Mobile 2053:3584: one column (gap 12), cards 145 tall: the 48 icon left of the text (gap 20, title → text 6),
+ * the content centred in the card; text 15; the button spans the column.
+ */
+import { Image } from 'astro:assets';
+import glow from '@/assets/decor/glow.svg';
+import glow10 from '@/assets/decor/glow-10.svg';
+import glowSmall from '@/assets/decor/glow-sm.svg';
+import glowSmall10 from '@/assets/decor/glow-sm-10.svg';
+import glowXs10 from '@/assets/decor/glow-xs-10.svg';
+import IconBuiltForRetention from '@/assets/icons/built-for-retention.svg';
+import IconCreativeThatConverts from '@/assets/icons/creative-that-converts.svg';
+import IconDedicatedSupport from '@/assets/icons/dedicated-support.svg';
+import IconFlexibleCommissions from '@/assets/icons/flexible-commissions.svg';
+import IconSeamlessTracking from '@/assets/icons/seamless-tracking.svg';
+import IconTransparentEarnings from '@/assets/icons/transparent-earnings.svg';
+import Button from '@/components/ui/Button.astro';
+import Card from '@/components/ui/Card.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import { site } from '@/data/site';
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  text?: string;
+  items?: { title: string; text: string }[];
+  cta?: string;
+  ctaHref?: string;
+}
+
+const t = useTranslations(Astro.currentLocale).benefits;
+const { eyebrow = t.eyebrow, title = t.title, text = t.text, items = t.items, cta = t.cta, ctaHref = site.signUpUrl } = Astro.props;
+
+// one icon per card, in the design order of the items
+const icons = [
+  IconFlexibleCommissions,
+  IconTransparentEarnings,
+  IconDedicatedSupport,
+  IconCreativeThatConverts,
+  IconBuiltForRetention,
+  IconSeamlessTracking,
+];
+---
+
+<section class="section padding-md" id="benefits" aria-labelledby="benefits-title">
+  <div class="background-slot overflow-x-clip" aria-hidden="true">
+    <div class="container">
+      <div class="desktop-only">
+        <Image src={glow} alt="" layout="none" class="benefits_glow" />
+        <Image src={glow10} alt="" layout="none" class="benefits_glow-low" />
+        <Image src={glow} alt="" layout="none" class="benefits_glow-right" />
+      </div>
+      <div class="desktop-hide">
+        <div class="mobile-hide">
+          <Image src={glowSmall10} alt="" layout="none" class="benefits_glow-top" />
+          <Image src={glowSmall} alt="" layout="none" class="benefits_glow-bottom" />
+        </div>
+      </div>
+      <div class="mobile-only">
+        <Image src={glowXs10} alt="" layout="none" class="benefits_glow-mobile" />
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="flex-v spacing-2xl">
+      <SectionHeader eyebrow={eyebrow} title={title} headingId="benefits-title" data-reveal>
+        <div class="text-size-p text-weight-500 text-color-secondary">
+          <p class="benefits_lead">{text}</p>
+        </div>
+      </SectionHeader>
+      <ul class="grid-3/2/1col spacing-20/16/12" data-reveal="stagger">
+        {
+          items.map((item, index) => {
+            const Icon = icons[index % icons.length];
+            return (
+              <Card size="sm" element="li" class="benefits_card">
+                <div class="benefits_item flex-v/v/h spacing-20/16/20">
+                  <Icon class="benefits_icon icon-2xl" aria-hidden="true" />
+                  <div class="benefits_text flex-v spacing-8/8/6">
+                    <h3 class="text-size-h3 text-weight-800">{item.title}</h3>
+                    <div class="text-size-16/14/15 text-color-secondary">
+                      <p>{item.text}</p>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            );
+          })
+        }
+      </ul>
+      <div class="justify-center" data-reveal>
+        <Button href={ctaHref} target="_blank" rel="noopener noreferrer" class="mob-width--100">{cta}</Button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .benefits_glow,
+  .benefits_glow-low,
+  .benefits_glow-right,
+  .benefits_glow-top,
+  .benefits_glow-bottom,
+  .benefits_glow-mobile {
+    position: absolute;
+    max-width: none;
+  }
+  /* desktop: 567 × 545 vectors → 1007 × 985 pictures */
+  .benefits_glow,
+  .benefits_glow-low,
+  .benefits_glow-right {
+    width: calc(63rem * var(--fluid-scale));
+    height: calc(61.5625rem * var(--fluid-scale));
+  }
+  .benefits_glow {
+    top: calc(-10.1875rem * var(--fluid-scale));
+    left: calc(-13.75rem * var(--fluid-scale));
+  }
+  .benefits_glow-low {
+    top: calc(37rem * var(--fluid-scale));
+    left: calc(-15.3125rem * var(--fluid-scale));
+  }
+  .benefits_glow-right {
+    top: calc(33.5625rem * var(--fluid-scale));
+    left: calc(49.6875rem * var(--fluid-scale));
+    scale: -1 1;
+  }
+  /* tablet: 400 × 384 vectors → 840 × 824 pictures */
+  .benefits_glow-top,
+  .benefits_glow-bottom {
+    width: calc(52.5rem * var(--fluid-scale));
+    height: calc(51.5rem * var(--fluid-scale));
+  }
+  .benefits_glow-top {
+    top: calc(-11.5625rem * var(--fluid-scale));
+    left: calc(-15.3125rem * var(--fluid-scale));
+  }
+  .benefits_glow-bottom {
+    top: calc(19.125rem * var(--fluid-scale));
+    left: calc(-24.5rem * var(--fluid-scale));
+  }
+  /* mobile: 300 × 284 vector → 740 × 724 picture */
+  .benefits_glow-mobile {
+    top: calc(4.875rem * var(--fluid-scale));
+    left: calc(-15.3125rem * var(--fluid-scale));
+    width: calc(46.25rem * var(--fluid-scale));
+    height: calc(45.25rem * var(--fluid-scale));
+  }
+  .benefits_lead {
+    max-width: calc(60.625rem * var(--fluid-scale));
+  }
+  .benefits_item {
+    align-items: flex-start;
+  }
+  .spacing-20\/16\/12,
+  .spacing-20\/16\/20 {
+    gap: var(--size-20);
+  }
+  .spacing-8\/8\/6 {
+    gap: var(--spacing-xs);
+  }
+  /* card text: Text 16 on desktop, 14 on tablet, 15 on mobile (130 %, −1 %) */
+  .text-size-16\/14\/15 {
+    font-size: var(--font-text);
+    line-height: var(--line-height-text);
+    letter-spacing: var(--letter-spacing-text);
+  }
+
+  @media (max-width: 991px) {
+    .spacing-20\/16\/12,
+    .spacing-20\/16\/20 {
+      gap: var(--size-16);
+    }
+    .text-size-16\/14\/15 {
+      font-size: var(--size-14);
+    }
+    /* tablet rows hug their content (items-start in the frame): a short card is not stretched to its neighbour */
+    .benefits_card {
+      align-self: start;
+    }
+    /* Figma's text box is 296: Chromium draws the 1.5 border as 1 px, so the box is capped to keep the frame's wraps */
+    .benefits_text {
+      max-width: calc(18.46875rem * var(--fluid-scale));
+    }
+  }
+
+  @media (max-width: 479px) {
+    /* benefit-card 145 tall (padding 20): the icon + text row is centred as one block (wrap + align-content),
+       the icon stays at the text's top */
+    .benefits_item {
+      flex-wrap: wrap;
+      align-content: center;
+      min-height: calc(6.5625rem * var(--fluid-scale));
+    }
+    .benefits_icon {
+      flex: none;
+      height: var(--size-48);
+    }
+    .benefits_text {
+      flex: 1;
+      min-width: 0;
+    }
+    .spacing-20\/16\/12 {
+      gap: var(--size-12);
+    }
+    .spacing-20\/16\/20 {
+      gap: var(--size-20);
+    }
+    .spacing-8\/8\/6 {
+      gap: var(--size-6);
+    }
+    .text-size-16\/14\/15 {
+      font-size: var(--font-text);
+    }
+  }
+</style>

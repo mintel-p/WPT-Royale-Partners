@@ -1,0 +1,14 @@
+<svg width="800" height="1203.49" viewBox="0 0 800 1203.49" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#card-glow-wide-blur)">
+<ellipse cx="400" cy="601.747" rx="100" ry="301.747" fill="url(#card-glow-wide-gradient)" fill-opacity="0.6"/>
+</g>
+<defs>
+<filter id="card-glow-wide-blur" x="0" y="0" width="800" height="1203.49" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feGaussianBlur stdDeviation="150"/>
+</filter>
+<radialGradient id="card-glow-wide-gradient" cx="0" cy="0" r="1" gradientTransform="matrix(123.042 194.203 -64.3595 967.092 400 601.747)" gradientUnits="userSpaceOnUse">
+<stop stop-color="#001FCD"/>
+<stop offset="1" stop-color="#001FCD" stop-opacity="0"/>
+</radialGradient>
+</defs>
+</svg>

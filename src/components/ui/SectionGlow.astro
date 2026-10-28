@@ -1,0 +1,109 @@
+---
+/**
+ * SectionGlow — the blue striped glow at a section's top-left corner (Figma "Frame 2147259875":
+ * ontario-banner 0:1406, faq 0:1454): six vertical stripes #082266 → #1145cc under a blurred gradient
+ * mask, 50 % opacity. Rendered as the section's background slot, anchored to the container's left edge
+ * (the frame's x 0), so it is the first child of the <section>.
+ *   type  default (ontario 0:1407: mask 453 × 486 at y −60, middle stop alpha 0.5; tablet 2039:1737: the frame
+ *                 starts 190 above the section, so the stripes reach into the section above — the slot grows up)
+ *         tall    (faq 0:1455: mask 453 × 560 at y −150, middle stop alpha 0.7; the same on tablet)
+ *         mirrored (commissions, tablet only 2045:3204: the default glow mirrored to the right edge; the frame
+ *                  starts 168 above the section, so the slot grows up as for the default type)
+ * The SVGs are the Figma exports of the mask groups; Figma drops the mask's layer blur (55) on export,
+ * so it is restored in the files (feGaussianBlur 27.65).
+ * Mobile (2053:3503): every type is the default glow × 0.7647 (mask 346.41 × 371.65 at y −45.88 of its frame) —
+ * the faq too, so `tall` shows the default picture there; the frame starts above the section: default (ontario
+ * 2053:3506) 136, tall (faq 2053:4736) 139.87, mirrored (commissions, the ontario frame 2053:4688) 144.87.
+ */
+import { Image } from 'astro:assets';
+import sectionGlow from '@/assets/decor/section-glow.svg';
+import sectionGlowTall from '@/assets/decor/section-glow-tall.svg';
+
+type Props = { type?: 'default' | 'tall' | 'mirrored' };
+const { type = 'default' } = Astro.props;
+---
+
+<div class:list={['background-slot section-glow', type !== 'default' && `type--${type}`]} aria-hidden="true">
+  <div class="container">
+    {
+      type === 'tall' ? (
+        <>
+          <div class="mobile-hide">
+            <Image src={sectionGlowTall} alt="" layout="none" class="section-glow_image" />
+          </div>
+          <div class="mobile-only">
+            <Image src={sectionGlow} alt="" layout="none" class="section-glow_image" />
+          </div>
+        </>
+      ) : (
+        <Image src={sectionGlow} alt="" layout="none" class="section-glow_image" />
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .section-glow {
+    overflow: hidden;
+  }
+  /* the export starts at the mask's top (frame y −60); 458 × 542 with the stripe shadows */
+  .section-glow_image {
+    position: absolute;
+    top: calc(-3.75rem * var(--fluid-scale));
+    /* the container's padding box starts at the frame's x 0 */
+    left: 0;
+    width: calc(28.625rem * var(--fluid-scale));
+    max-width: none;
+    height: calc(33.875rem * var(--fluid-scale));
+    /* where the slot cuts the stripes (the image y of the slot's top edge) and the side it keeps */
+    --glow-cut: calc(3.75rem * var(--fluid-scale));
+    --glow-fade: var(--size-160);
+    --glow-direction: to bottom;
+    /* the developer's decisions: the left edge fades out (at 1920 it no longer touches the screen edge), and the
+       stripes fade in over 160 from the slot's edge instead of being cut by it */
+    mask-image:
+      linear-gradient(to right, transparent, #000 15%),
+      linear-gradient(var(--glow-direction), transparent var(--glow-cut), #000 calc(var(--glow-cut) + var(--glow-fade)));
+    mask-composite: intersect;
+  }
+  /* the faq mask starts at frame y −150; 458 × 616 with the stripe shadows */
+  .section-glow.type--tall .section-glow_image {
+    --glow-cut: calc(9.375rem * var(--fluid-scale));
+    top: calc(-9.375rem * var(--fluid-scale));
+    height: calc(38.5rem * var(--fluid-scale));
+  }
+  /* mirrored: the export's left edge (and its fade) lies on the container's right edge */
+  .section-glow.type--mirrored .section-glow_image {
+    right: 0;
+    left: auto;
+    scale: -1 1;
+  }
+  @media (max-width: 991px) {
+    .section-glow:not(.type--tall, .type--mirrored) {
+      top: calc(-11.875rem * var(--fluid-scale));
+    }
+    .section-glow.type--mirrored {
+      top: calc(-10.5rem * var(--fluid-scale));
+    }
+  }
+  @media (max-width: 479px) {
+    .section-glow:not(.type--tall, .type--mirrored) {
+      top: calc(-8.5rem * var(--fluid-scale));
+    }
+    .section-glow.type--tall {
+      top: calc(-8.7419rem * var(--fluid-scale));
+    }
+    .section-glow.type--mirrored {
+      top: calc(-9.0544rem * var(--fluid-scale));
+    }
+    /* 458 × 542 × 0.7647 = 350.24 × 414.47; the mask at y −45.88 of the frame; the fade scales with it */
+    .section-glow .section-glow_image,
+    .section-glow.type--tall .section-glow_image {
+      --glow-cut: calc(2.8676rem * var(--fluid-scale));
+      --glow-fade: calc(7.647rem * var(--fluid-scale));
+      top: calc(-2.8676rem * var(--fluid-scale));
+      width: calc(21.89rem * var(--fluid-scale));
+      height: calc(25.9044rem * var(--fluid-scale));
+    }
+  }
+</style>

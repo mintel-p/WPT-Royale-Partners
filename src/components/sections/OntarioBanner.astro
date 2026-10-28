@@ -1,0 +1,218 @@
+---
+/**
+ * OntarioBanner — Figma Desktop 0:353 ("ontario-banner"): text column (section header + two buttons) next to
+ * the "portrait-visual" 0:363 — rings, blue glow, the Ontario dot map (1017 dots, one Union) and two green
+ * checks exported as one SVG (src/assets/ontario/ontario-visual.svg, the chips left out; svgo, precision 2;
+ * layout="none": an SVG needs no srcset), with the three trust
+ * chips (ui/Tag type="chip") on top as text. The striped glow at the top-left is ui/SectionGlow (0:1406).
+ * Tablet 2039:683: the 580 text column centred over the visual (gap 40); header → buttons 28; the visual is
+ * 685 × 591 with the same art 33.5 lower (centred in the taller box); the mirrored blurred glow "Vector 8987"
+ * 2045:2139 (456 wide at x 461, y 160 → the picture 220 further out) behind the right side, reaching 60 into
+ * the section above.
+ * Mobile 2053:3634 (padding 40 / 0): the column stacked (info → visual 32, header → buttons 32), the buttons one
+ * under the other across the column; the 358 × 308.87 visual holds the desktop art × 0.5226 with one green check
+ * moved, so it is its own export (src/assets/ontario/ontario-visual-mobile.svg, "Frame 2147259884" 2053:3646 without
+ * the chips; render bounds from x −12.83, y −30.33 of the visual), and the chips are the desktop chips × 0.5749.
+ * No blurred glow on mobile; the striped glow starts 136 above the section.
+ */
+import { Image } from 'astro:assets';
+import glowMedium from '@/assets/decor/glow-md.svg';
+import ontarioVisual from '@/assets/ontario/ontario-visual.svg';
+import ontarioVisualMobile from '@/assets/ontario/ontario-visual-mobile.svg';
+import Button from '@/components/ui/Button.astro';
+import SectionGlow from '@/components/ui/SectionGlow.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import Tag from '@/components/ui/Tag.astro';
+import { site } from '@/data/site';
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  text?: string;
+  cta?: string;
+  ctaHref?: string;
+  more?: string;
+  moreHref?: string;
+  chips?: string[];
+}
+
+const t = useTranslations(Astro.currentLocale).ontarioBanner;
+const {
+  eyebrow = t.eyebrow,
+  title = t.title,
+  text = t.text,
+  cta = t.cta,
+  ctaHref = site.signUpUrl,
+  more = t.more,
+  moreHref = '#faq',
+  chips = t.chips,
+} = Astro.props;
+---
+
+<section class="section padding-top-md padding-bottom-md/md/0" id="compliance" aria-labelledby="compliance-title">
+  <div class="background-slot overflow-x-clip desktop-hide" aria-hidden="true">
+    <div class="container">
+      <div class="mobile-hide">
+        <Image src={glowMedium} alt="" layout="none" class="ontario-banner_glow" />
+      </div>
+    </div>
+  </div>
+  <SectionGlow />
+  <div class="container">
+    <div class="flex-h/v/v align-center spacing-32/40/32">
+      <div class="ontario-banner_info" data-reveal>
+        <div class="flex-v align-start/center/center spacing-32/28/32">
+          <SectionHeader eyebrow={eyebrow} title={title} align="start" headingId="compliance-title">
+            <div class="text-size-p text-weight-500 text-color-secondary">
+              <p>{text}</p>
+            </div>
+          </SectionHeader>
+          <div class="flex-h/h/v spacing-md mob-width--100">
+            <Button href={ctaHref} target="_blank" rel="noopener noreferrer">{cta}</Button>
+            <Button variant="secondary" href={moreHref}>{more}</Button>
+          </div>
+        </div>
+      </div>
+      <div class="ontario-banner_visual" data-reveal>
+        <div class="mobile-hide">
+          <Image src={ontarioVisual} alt="" layout="none" class="ontario-banner_art" />
+        </div>
+        <div class="mobile-only">
+          <Image src={ontarioVisualMobile} alt="" layout="none" class="ontario-banner_art" />
+        </div>
+        <ul class="ontario-banner_chips">
+          {
+            chips.map((chip) => (
+              <li class="ontario-banner_chip">
+                <Tag type="chip">{chip}</Tag>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* tablet only: 456 × 437 vector → 896 × 877 picture */
+  .ontario-banner_glow {
+    position: absolute;
+    top: calc(-3.75rem * var(--fluid-scale));
+    left: calc(15.0625rem * var(--fluid-scale));
+    width: calc(56rem * var(--fluid-scale));
+    max-width: none;
+    height: calc(54.8125rem * var(--fluid-scale));
+    scale: -1 1;
+  }
+  .padding-bottom-md\/md\/0 {
+    padding-bottom: var(--section-padding-md);
+  }
+  .spacing-32\/40\/32 {
+    gap: var(--size-32);
+  }
+  .spacing-32\/28\/32 {
+    gap: var(--size-32);
+  }
+  .ontario-banner_info {
+    width: calc(35.1875rem * var(--fluid-scale));
+  }
+  /* "portrait-visual" 685 × 524; the art and the chips overflow it as in the frame */
+  .ontario-banner_visual {
+    /* the art's vertical offset in the box: 0 on desktop, 33.5 on tablet */
+    --ontario-art-offset: 0px;
+    position: relative;
+    flex: none;
+    width: calc(42.8125rem * var(--fluid-scale));
+    height: calc(32.75rem * var(--fluid-scale));
+  }
+  /* the export's render bounds (glow blur included) start at x −24, y −91 of the visual */
+  .ontario-banner_art {
+    position: absolute;
+    top: calc(-5.6875rem * var(--fluid-scale) + var(--ontario-art-offset));
+    left: calc(-1.5rem * var(--fluid-scale));
+    width: calc(45.9375rem * var(--fluid-scale));
+    max-width: none;
+    height: calc(44.25rem * var(--fluid-scale));
+  }
+  .ontario-banner_chips {
+    position: absolute;
+    inset: var(--ontario-art-offset) 0 0;
+  }
+  .ontario-banner_chip {
+    position: absolute;
+  }
+  /* chip positions in the visual: AGCO (255, 16), Dedicated support (510, 197), Reliable legal payouts (83, 412) */
+  .ontario-banner_chip:nth-child(1) {
+    top: var(--size-16);
+    left: calc(15.9375rem * var(--fluid-scale));
+  }
+  .ontario-banner_chip:nth-child(2) {
+    top: calc(12.3125rem * var(--fluid-scale));
+    left: calc(31.875rem * var(--fluid-scale));
+  }
+  .ontario-banner_chip:nth-child(3) {
+    top: calc(25.75rem * var(--fluid-scale));
+    left: calc(5.1875rem * var(--fluid-scale));
+  }
+
+  @media (max-width: 991px) {
+    .spacing-32\/40\/32 {
+      gap: var(--size-40);
+    }
+    .spacing-32\/28\/32 {
+      gap: var(--size-28);
+    }
+    .ontario-banner_info {
+      width: calc(36.25rem * var(--fluid-scale));
+    }
+    .ontario-banner_visual {
+      --ontario-art-offset: calc(2.09375rem * var(--fluid-scale));
+      height: calc(36.9375rem * var(--fluid-scale));
+    }
+  }
+
+  @media (max-width: 479px) {
+    .padding-bottom-md\/md\/0 {
+      padding-bottom: 0;
+    }
+    .spacing-32\/40\/32,
+    .spacing-32\/28\/32 {
+      gap: var(--size-32);
+    }
+    .ontario-banner_info {
+      width: 100%;
+    }
+    /* "portrait-visual" 358 × 308.87 */
+    .ontario-banner_visual {
+      --ontario-art-offset: 0px;
+      width: calc(22.375rem * var(--fluid-scale));
+      height: calc(19.3044rem * var(--fluid-scale));
+    }
+    .ontario-banner_art {
+      top: calc(-1.8953rem * var(--fluid-scale));
+      left: calc(-0.8019rem * var(--fluid-scale));
+      width: calc(24rem * var(--fluid-scale));
+      height: calc(23.125rem * var(--fluid-scale));
+    }
+    /* the desktop chips × 0.5749 (36 → 20.7 tall), at AGCO (126.01, 23.57), Dedicated support (262, 118.36),
+       Reliable legal payouts (1, 231.96) of the visual */
+    .ontario-banner_chip {
+      transform-origin: 0 0;
+      scale: 0.5749;
+    }
+    .ontario-banner_chip:nth-child(1) {
+      top: calc(1.4731rem * var(--fluid-scale));
+      left: calc(7.8756rem * var(--fluid-scale));
+    }
+    .ontario-banner_chip:nth-child(2) {
+      top: calc(7.3975rem * var(--fluid-scale));
+      left: calc(16.375rem * var(--fluid-scale));
+    }
+    .ontario-banner_chip:nth-child(3) {
+      top: calc(14.4975rem * var(--fluid-scale));
+      left: calc(0.0625rem * var(--fluid-scale));
+    }
+  }
+</style>

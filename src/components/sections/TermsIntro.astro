@@ -1,0 +1,115 @@
+---
+/**
+ * TermsIntro — the first section of the Terms and Conditions page, Figma "Document introduction"
+ * (Untitled: desktop 24:1296, tablet 24:1924, mobile 24:733): the breadcrumb (nav, Medium 14, Text Secondary,
+ * the current page in Accent Yellow, items 12 apart) over the H1, a 2px Border Color line at the bottom.
+ * Desktop: padding 36 / 56, the text column starts at x 160 (the container's 80 + 80), breadcrumb → title 40.
+ * Tablet: the same at x 32. Mobile: padding 24 / 40, breadcrumb → title 32.
+ * The blurred glow "Vector 8987" / "Ambient light" (desktop and tablet 567 × 544.5 at x −130, y −159; mobile 390 × 374 at
+ * x −90, y −100) is the shape of how-it-works' glow: glow.svg (blur 220 → the picture 220 further out) and, on
+ * mobile, glow-xs-wide.svg (blur 151); not clipped at the bottom (the frame does not clip it).
+ */
+import { Image } from 'astro:assets';
+import glow from '@/assets/decor/glow.svg';
+import glowXsWide from '@/assets/decor/glow-xs-wide.svg';
+import { localePath, useTranslations } from '@/i18n';
+
+interface Props {
+  title?: string;
+}
+
+const t = useTranslations(Astro.currentLocale).terms;
+const { title = t.title } = Astro.props;
+---
+
+<section class="section section--hero" aria-labelledby="terms-title" data-intro>
+  <div class="background-slot overflow-x-clip terms-intro_line" aria-hidden="true">
+    <div class="container">
+      <div class="mobile-hide">
+        <Image src={glow} alt="" layout="none" class="terms-intro_glow" />
+      </div>
+      <div class="mobile-only">
+        <Image src={glowXsWide} alt="" layout="none" class="terms-intro_glow-sm" />
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="terms-intro_content spacing-40/40/32">
+      <nav aria-label={t.breadcrumbLabel} data-reveal data-reveal-delay="0">
+        <ol class="flex-h align-center text-size-nav text-weight-500 text-color-secondary">
+          <li>
+            <a href={localePath('/', Astro.currentLocale)} class="terms-intro_home">{t.home}</a>
+          </li>
+          <li class="terms-intro_current">
+            <span aria-current="page">{title}</span>
+          </li>
+        </ol>
+      </nav>
+      <div data-reveal data-reveal-delay="1">
+        <h1 id="terms-title" class="text-size-h1 text-weight-800 text-color-primary">{title}</h1>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* the 2px Border Color line under the section (takes no layout space) */
+  .terms-intro_line {
+    border-bottom: var(--border-width-md) solid var(--theme-border);
+  }
+  .terms-intro_glow {
+    position: absolute;
+    top: calc(var(--header-height) - 23.6875rem * var(--fluid-scale));
+    left: calc(-21.875rem * var(--fluid-scale));
+    width: calc(63rem * var(--fluid-scale));
+    max-width: none;
+    height: calc(61.5625rem * var(--fluid-scale));
+  }
+  .terms-intro_glow-sm {
+    position: absolute;
+    top: calc(var(--header-height) - 15.6875rem * var(--fluid-scale));
+    left: calc(-15.0625rem * var(--fluid-scale));
+    width: calc(43.25rem * var(--fluid-scale));
+    max-width: none;
+    height: calc(42.3125rem * var(--fluid-scale));
+  }
+  .terms-intro_content {
+    display: flex;
+    flex-direction: column;
+    padding: var(--size-36) var(--size-80) var(--size-56);
+  }
+  .spacing-40\/40\/32 {
+    gap: var(--size-40);
+  }
+  /* "/" between the items, 12 on both sides */
+  .terms-intro_current::before {
+    content: '/';
+    margin-inline: var(--size-12);
+    color: var(--theme-text-secondary);
+  }
+  .terms-intro_current {
+    color: var(--theme-text-brand);
+  }
+  .terms-intro_home {
+    transition: color var(--transition-duration) var(--transition-easing);
+  }
+  .terms-intro_home:hover,
+  .terms-intro_home:focus-visible {
+    color: var(--theme-text);
+  }
+
+  @media (max-width: 991px) {
+    .terms-intro_content {
+      padding-inline: 0;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .terms-intro_content {
+      padding-block: var(--size-24) var(--size-40);
+    }
+    .spacing-40\/40\/32 {
+      gap: var(--size-32);
+    }
+  }
+</style>

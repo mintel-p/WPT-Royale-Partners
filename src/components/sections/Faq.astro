@@ -1,0 +1,108 @@
+---
+/**
+ * Faq — Figma Desktop 0:1453 ("faq"): section header (left, pinned at its closed-state offset) + four FAQ items
+ * (ui/FaqItem, all closed as in the frame). The questions and answers come from the UI kit (0:74),
+ * the desktop frame repeats its second question in the first item. The striped glow at the top-left
+ * is ui/SectionGlow type="tall" (0:1454).
+ * Tablet 2039:1796: the header centred (580) over the full-width list (gap 40), items 20 apart.
+ * Mobile 2053:4735: no section padding (the page gap of 40 separates it), header → list 32, items 16 apart;
+ * the striped glow is the default one there, its frame 139.87 above the section. The frame shows the first item
+ * open; here every item starts closed, as on desktop.
+ */
+import FaqItem from '@/components/ui/FaqItem.astro';
+import SectionGlow from '@/components/ui/SectionGlow.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  text?: string;
+  items?: { question: string; answer: string }[];
+}
+
+const t = useTranslations(Astro.currentLocale).faq;
+const { eyebrow = t.eyebrow, title = t.title, text = t.text, items = t.items } = Astro.props;
+---
+
+<section class="section padding-md/md/0" id="faq" aria-labelledby="faq-title">
+  <SectionGlow type="tall" />
+  <div class="container">
+    <div class="flex-h/v/v align-start spacing-80/40/32">
+      <div class="faq_info" data-reveal>
+        <SectionHeader eyebrow={eyebrow} title={title} align="start" headingId="faq-title">
+          <div class="text-size-p text-weight-500 text-color-secondary">
+            <p class="faq_lead">{text}</p>
+          </div>
+        </SectionHeader>
+      </div>
+      <ul class="faq_list flex-v spacing-16/20/16" data-reveal="stagger">
+        {
+          items.map((item) => (
+            <li>
+              <FaqItem question={item.question}>
+                <p>{item.answer}</p>
+              </FaqItem>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .padding-md\/md\/0 {
+    padding-block: var(--section-padding-md);
+  }
+  .spacing-80\/40\/32 {
+    gap: var(--size-80);
+  }
+  .spacing-16\/20\/16 {
+    gap: var(--size-16);
+  }
+  /* "section-header" 522 wide, at y 141.5 of the frame = 61.5 below the list's top while every item is
+     closed; the row aligns to the top, so opening an item never moves the header */
+  .faq_info {
+    width: calc(32.625rem * var(--fluid-scale));
+    margin-top: calc(3.84375rem * var(--fluid-scale));
+  }
+  .faq_lead {
+    max-width: calc(26.25rem * var(--fluid-scale));
+  }
+  .faq_list {
+    flex: none;
+    width: calc(42.3125rem * var(--fluid-scale));
+  }
+
+  @media (max-width: 991px) {
+    .spacing-80\/40\/32 {
+      gap: var(--size-40);
+    }
+    .spacing-16\/20\/16 {
+      gap: var(--size-20);
+    }
+    .faq_info {
+      width: 100%;
+      margin-top: 0;
+    }
+    .faq_lead {
+      max-width: none;
+    }
+    .faq_list {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .padding-md\/md\/0 {
+      padding-block: 0;
+    }
+    .spacing-80\/40\/32 {
+      gap: var(--size-32);
+    }
+    .spacing-16\/20\/16 {
+      gap: var(--size-16);
+    }
+  }
+</style>

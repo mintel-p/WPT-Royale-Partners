@@ -1,0 +1,41 @@
+---
+/**
+ * NavLink — Figma component "nav-link": Text Secondary, hover = focus-visible → Text Primary.
+ * Used in the header menu and the footer columns.
+ * Where we are (no Figma state: Accent Yellow, the site's current-item colour as in the breadcrumb):
+ *   - a link to the current page renders without `href`, with aria-current="page" (not clickable, out of the Tab order);
+ *   - a link to a section of this page (`/#faq` on the home page) gets aria-current="location" while that section
+ *     is on screen (src/scripts/nav-spy.ts).
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+type Props = HTMLAttributes<'a'>;
+const { class: className, href, ...rest } = Astro.props;
+// both with a trailing slash: the dev server may serve /privacy-policy, the build /privacy-policy/
+const isCurrent = typeof href === 'string' && href === Astro.url.pathname.replace(/\/?$/, '/');
+---
+
+<a class:list={['nav-link', className]} href={isCurrent ? undefined : href} aria-current={isCurrent ? 'page' : undefined} {...rest}><slot /></a>
+
+<script>
+  import '@/scripts/nav-spy';
+</script>
+
+<style>
+  .nav-link {
+    color: var(--theme-text-secondary);
+    font-size: var(--font-nav);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-nav);
+    letter-spacing: var(--letter-spacing-nav);
+    white-space: nowrap;
+    transition: color var(--transition-duration) var(--transition-easing);
+  }
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    color: var(--theme-text);
+  }
+  .nav-link[aria-current] {
+    color: var(--theme-text-brand);
+  }
+</style>

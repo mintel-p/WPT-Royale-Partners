@@ -1,0 +1,215 @@
+---
+/**
+ * FaqItem — Figma component "faq-item" (Default / Active) on a native <details>: works without JS;
+ * the script below animates the height on open/close (astro-components.md → Accordion), native toggle
+ * under prefers-reduced-motion.
+ *   Default  fill #040d29 25 %, Border Color, toggle box 10 % with a plus
+ *   Active   fill #040d29 → 25 %, Accent Yellow 25 % stroke, toggle box 15 % + white 10 % stroke, minus,
+ *            a #122041 divider above the answer
+ * Mobile "faq-item mobile" (2053:4753): radius 20, padding 20 on every side, the divider 12 under the question
+ * and the answer 12 under the divider.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+type Props = HTMLAttributes<'details'> & { question: string };
+const { question, class: className, ...rest } = Astro.props;
+---
+
+<details class:list={['faq-item', className]} data-accordion {...rest}>
+  <summary class="faq-item_summary">
+    <h3 class="text-size-h3 text-weight-800">{question}</h3>
+    <span class="faq-item_toggle" aria-hidden="true"></span>
+  </summary>
+  <div class="faq-item_answer text-color-secondary">
+    <slot />
+  </div>
+</details>
+
+<style>
+  .faq-item {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    /* Figma strokes inside: an inset outline takes no layout space (a 1.5 border snaps to 1 px in Chromium) */
+    outline: var(--border-width-sm) solid var(--theme-border);
+    outline-offset: calc(var(--border-width-sm) * -1);
+    border-radius: var(--radius-lg);
+    /* #040d29 25 % over the solid page background (tablet 2039:1813): the section glow never shows through */
+    background-color: var(--theme-page-bg);
+    background-image: linear-gradient(rgb(4 13 41 / 0.25), rgb(4 13 41 / 0.25));
+    transition: outline-color var(--transition-duration) var(--transition-easing);
+  }
+  /* the Active gradient fill fades in (a gradient itself can't transition) */
+  .faq-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    /* over the item's own 25 % layer: 100 % at the top → 25 % at the bottom, as the Active fill */
+    background: linear-gradient(180deg, var(--swatch-navy), rgb(4 13 41 / 0));
+    opacity: 0;
+    transition: opacity var(--transition-duration) var(--transition-easing);
+  }
+  /* the Active stroke is a gradient (Accent Yellow 25 % top-left → #122041 bottom-right, 2064:721): a 1.5 ring
+     masked out of a gradient layer replaces the outline and fades in with the fill */
+  .faq-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    padding: var(--border-width-sm);
+    border-radius: inherit;
+    background: linear-gradient(to bottom right, var(--theme-card-border-brand) 32%, var(--swatch-navy-line) 74%);
+    opacity: 0;
+    pointer-events: none;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    transition: opacity var(--transition-duration) var(--transition-easing);
+  }
+  .faq-item[open]:not(.is--closing) {
+    outline-color: transparent;
+  }
+  .faq-item[open]:not(.is--closing)::before,
+  .faq-item[open]:not(.is--closing)::after {
+    opacity: 1;
+  }
+  .faq-item_summary {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--size-20) var(--size-24);
+    border-radius: inherit;
+    cursor: pointer;
+    list-style: none;
+  }
+  /* the item clips its content: the keyboard ring (2 px, base.css) goes just inside the stroke */
+  .faq-item_summary:focus-visible {
+    outline-offset: calc((var(--border-width-sm) + 2px) * -1);
+  }
+  .faq-item_summary::-webkit-details-marker {
+    display: none;
+  }
+  /* the question stays Text Primary in every state (the designer's decision): the toggle reacts instead */
+  .faq-item_summary h3 {
+    flex: 1;
+  }
+
+  /* toggle box 40 × 40 with a plus (two 12 × 2 bars); the vertical bar folds away into a minus */
+  .faq-item_toggle {
+    position: relative;
+    flex: none;
+    width: var(--icon-height-lg);
+    height: var(--icon-height-lg);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background-color: rgb(142 155 180 / 0.1);
+    transition:
+      background-color var(--transition-duration) var(--transition-easing),
+      border-color var(--transition-duration) var(--transition-easing);
+  }
+  .faq-item_toggle::before,
+  .faq-item_toggle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--icon-height-xs);
+    height: var(--size-2);
+    border-radius: var(--radius-md);
+    background-color: var(--swatch-grey-light);
+    translate: -50% -50%;
+    transition:
+      background-color var(--transition-duration) var(--transition-easing),
+      transform var(--transition-duration) var(--transition-easing);
+  }
+  .faq-item_toggle::after {
+    transform: rotate(90deg);
+  }
+  /* hover (mouse only, so a tap never leaves it on) = keyboard focus: the plus / minus turns white */
+  @media (hover: hover) {
+    .faq-item_summary:hover .faq-item_toggle::before,
+    .faq-item_summary:hover .faq-item_toggle::after {
+      background-color: var(--swatch-white);
+    }
+  }
+  .faq-item_summary:focus-visible .faq-item_toggle::before,
+  .faq-item_summary:focus-visible .faq-item_toggle::after {
+    background-color: var(--swatch-white);
+  }
+  .faq-item[open]:not(.is--closing) .faq-item_toggle {
+    border-color: rgb(255 255 255 / 0.1);
+    background-color: rgb(142 155 180 / 0.15);
+  }
+  .faq-item[open]:not(.is--closing) .faq-item_toggle::before,
+  .faq-item[open]:not(.is--closing) .faq-item_toggle::after {
+    background-color: var(--swatch-white);
+  }
+  .faq-item[open]:not(.is--closing) .faq-item_toggle::after {
+    transform: rotate(0deg);
+  }
+
+  .faq-item_answer {
+    /* Active: the divider is 16 below the question row (the summary keeps its 20 so the closed height never jumps) */
+    margin: calc(var(--spacing-md) - var(--size-20)) var(--border-width-sm) 0;
+    /* the divider ends at the stroke's inner edge (Figma strokes inside); the text stays 24 from the outer edge */
+    padding: var(--spacing-md) calc(var(--size-24) - var(--border-width-sm)) var(--size-20);
+    border-top: 1px solid var(--swatch-navy-line);
+  }
+  @media (max-width: 479px) {
+    .faq-item_summary {
+      padding: var(--size-20);
+    }
+    .faq-item_answer {
+      margin-top: calc(var(--size-12) - var(--size-20));
+      padding: var(--size-12) calc(var(--size-20) - var(--border-width-sm)) var(--size-20);
+    }
+  }
+</style>
+
+<script>
+  // Smooth open/close of every <details data-accordion> (astro-components.md → Accordion)
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  for (const details of document.querySelectorAll<HTMLDetailsElement>('details[data-accordion]')) {
+    const summary = details.querySelector('summary');
+    if (!summary) continue;
+
+    summary.addEventListener('click', (event) => {
+      if (reduced.matches) return;
+      event.preventDefault();
+      if (details.classList.contains('is--animating')) return;
+
+      const root = getComputedStyle(document.documentElement);
+      const duration = parseFloat(root.getPropertyValue('--transition-duration')) * 1000 || 300;
+      const easing = root.getPropertyValue('--transition-easing').trim() || 'ease-out';
+      const closedHeight = `${summary.offsetHeight + details.offsetHeight - details.clientHeight}px`;
+      const opening = !details.open;
+
+      details.classList.add('is--animating');
+      if (opening) details.open = true;
+      else details.classList.add('is--closing');
+
+      const openHeight = `${details.offsetHeight}px`;
+      const animation = details.animate(
+        { height: opening ? [closedHeight, openHeight] : [openHeight, closedHeight] },
+        { duration, easing },
+      );
+      // The answer and its divider fade with the height: the divider sits 4 px inside the closed box (16 under
+      // the question, the summary keeps 20), so at the closed height it would lie on the card's bottom stroke.
+      // It stays hidden through the first fifth of the opening and is gone by the middle of the closing.
+      details.querySelector('.faq-item_answer')?.animate(
+        opening
+          ? [{ opacity: 0 }, { opacity: 0, offset: 0.2 }, { opacity: 1 }]
+          : [{ opacity: 1 }, { opacity: 0, offset: 0.5 }, { opacity: 0 }],
+        { duration, easing },
+      );
+      animation.onfinish = () => {
+        if (!opening) details.open = false;
+        details.classList.remove('is--animating', 'is--closing');
+      };
+    });
+  }
+</script>

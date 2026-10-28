@@ -1,0 +1,55 @@
+---
+/**
+ * Logo — Figma component "Logo / Horizontal". The logo is raster in Figma (3D gold lettering), so it is a
+ * picture exported at 4x with its transparency (src/assets/shared/logo-horizontal.png), not an SVG.
+ *   size  md (header: 205 × 48; 153.55 × 36 on mobile)
+ *         lg (footer 2064:679: its own composition — the card mark, the gold wordmark and "Partners" in white —
+ *            exported at 4x on black and white, alpha recovered: logo-footer.png; 217 × 56, 180 wide on tablet
+ *            2064:6113; the mobile footer shows md, as its frame does)
+ * The alt is the site name; inside a link it is the link's accessible name.
+ */
+import { Picture } from 'astro:assets';
+import type { HTMLAttributes } from 'astro/types';
+import logo from '@/assets/shared/logo-horizontal.png';
+import logoFooter from '@/assets/shared/logo-footer.png';
+import { site } from '@/data/site';
+import { localized } from '@/i18n';
+
+type Props = Omit<HTMLAttributes<'img'>, 'src' | 'srcset' | 'width' | 'height' | 'alt'> & { size?: 'md' | 'lg' };
+const { size = 'md', class: className, ...rest } = Astro.props;
+---
+
+<Picture
+  src={size === 'lg' ? logoFooter : logo}
+  width={size === 'lg' ? 217 : 205}
+  sizes={
+    size === 'lg'
+      ? '(min-width: 1440px) 217px, (min-width: 992px) 15.07vw, (min-width: 480px) 23.44vw, 39.37vw'
+      : '(min-width: 1440px) 205px, (min-width: 992px) 14.24vw, (min-width: 480px) 26.66vw, 39.37vw'
+  }
+  formats={['avif', 'webp']}
+  alt={localized(site.name, Astro.currentLocale)}
+  class:list={['logo', size === 'lg' && 'size--lg', className]}
+  {...rest}
+/>
+
+<style>
+  .logo {
+    width: calc(12.8125rem * var(--fluid-scale));
+    height: auto;
+  }
+  .logo.size--lg {
+    width: calc(13.5625rem * var(--fluid-scale));
+  }
+  @media (max-width: 991px) {
+    .logo.size--lg {
+      width: calc(11.25rem * var(--fluid-scale));
+    }
+  }
+  @media (max-width: 479px) {
+    .logo,
+    .logo.size--lg {
+      width: calc(9.597rem * var(--fluid-scale));
+    }
+  }
+</style>

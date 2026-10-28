@@ -1,0 +1,109 @@
+---
+/**
+ * SiteHeader — Figma Header 0:242 (UI kit 0:107): logo → home, the five page anchors, Login + Register.
+ * Rendered through <BaseLayout> slot="header": the layout owns header-fixed > header (padding, blur).
+ * Tablet "tablet-header" (Untitled 7:568): logo, Login + Register (gap 12), the 40 menu icon (gap 20);
+ * the anchors move to the menu.
+ * Mobile "mobile-header" 2053:3518 (64): the 36 logo and the 36 menu icon only, Login and Register are not in the frame.
+ * Menu (Untitled "Menu" 38:1197): the menu icon opens SiteMenu (tablet + mobile), which gets the same anchors.
+ */
+import IconMenu from '@/assets/icons/menu.svg';
+import Button from '@/components/ui/Button.astro';
+import Logo from '@/components/ui/Logo.astro';
+import NavLink from '@/components/ui/NavLink.astro';
+import SiteMenu from '@/components/sections/SiteMenu.astro';
+import { site } from '@/data/site';
+import { localePath, useTranslations } from '@/i18n';
+
+const t = useTranslations(Astro.currentLocale).siteHeader;
+const locale = Astro.currentLocale;
+const nav = t.nav.map((item) => ({ label: item.label, href: localePath(item.href, locale) }));
+---
+
+<div class="container">
+  <div class="site-header_bar spacing-xl">
+    <a href={localePath('/', locale)} class="site-header_logo">
+      <Logo loading="eager" />
+    </a>
+    <div class="desktop-only">
+      <nav aria-label={t.navLabel}>
+        <ul class="flex-h align-center spacing-xl">
+          {
+            nav.map((item) => (
+              <li>
+                <NavLink href={item.href}>{item.label}</NavLink>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+    <div class="flex-h align-center spacing-20">
+      <div class="mobile-hide">
+        <div class="flex-h align-center spacing-16/12/12">
+          <Button href={site.signUpUrl} variant="ghost" size="sm" target="_blank" rel="noopener noreferrer">{t.login}</Button>
+          <Button href={site.signUpUrl} size="sm" target="_blank" rel="noopener noreferrer">{t.register}</Button>
+        </div>
+      </div>
+      <div class="desktop-hide">
+        <button
+          type="button"
+          class="site-header_menu"
+          aria-label={t.menu}
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="site-menu"
+          data-menu-toggle
+        >
+          <IconMenu class="site-header_menu-icon" aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<SiteMenu items={nav} />
+
+<style>
+  .site-header_bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .site-header_logo {
+    display: flex;
+    transition: opacity var(--transition-duration) var(--transition-easing);
+  }
+  .site-header_logo:hover,
+  .site-header_logo:focus-visible {
+    opacity: 0.7;
+  }
+  .spacing-16\/12\/12 {
+    gap: var(--size-16);
+  }
+  /* "32px / Menu": 40 × 40, Text Secondary lines */
+  .site-header_menu {
+    display: flex;
+    color: var(--theme-icon-secondary);
+    transition: color var(--transition-duration) var(--transition-easing);
+  }
+  .site-header_menu:hover,
+  .site-header_menu:focus-visible {
+    color: var(--theme-icon);
+  }
+  .site-header_menu-icon {
+    width: var(--size-40);
+    height: var(--size-40);
+  }
+  @media (max-width: 991px) {
+    .spacing-16\/12\/12 {
+      gap: var(--size-12);
+    }
+  }
+  /* "32px / Menu" 36 × 36 on mobile */
+  @media (max-width: 479px) {
+    .site-header_menu-icon {
+      width: var(--size-36);
+      height: var(--size-36);
+    }
+  }
+</style>

@@ -1,0 +1,385 @@
+---
+/**
+ * SiteMenu — the tablet and mobile menu (Untitled "Menu" 38:1197), opened by the header's menu icon
+ * ([data-menu-toggle] in SiteHeader, which passes the page anchors as `items`).
+ * A modal <dialog> (focus trap, Esc, ::backdrop) in the top layer, so the backdrop blur sees the whole page.
+ *   mobile 28:8990 — full screen: logo + ×, the anchors (18, 24 apart), Login + Register full width at the bottom
+ *     (48 tall, 20 apart: the designer's change after the frame, 2026-10-26)
+ *   tablet 34:13718 — a 460 panel on the right over the blurred page (36:1198): Login + Register + ×
+ *     on the header's line, the anchors (20, 40 apart), "Become a Partner" at the bottom
+ * Items: Tertiary Regular with a dot; the section on screen (nav-spy via NavLink, aria-current) Text Primary
+ * Medium underlined with the blue dot ("Benefits" in Figma).
+ * Motion (no Figma prototype): the tablet panel slides in from the right while the page behind blurs,
+ * the mobile one unrolls from the top; then the rows rise in one by one and the × turns in.
+ * Closing (×, the backdrop, Esc, a link, the desktop width) plays it back faster; a same-page link
+ * scrolls once the menu has closed.
+ */
+import IconClose from '@/assets/icons/close.svg';
+import Button from '@/components/ui/Button.astro';
+import Logo from '@/components/ui/Logo.astro';
+import NavLink from '@/components/ui/NavLink.astro';
+import { site } from '@/data/site';
+import { localePath, useTranslations } from '@/i18n';
+
+type Props = { items: { label: string; href: string }[] };
+
+const { items } = Astro.props;
+const t = useTranslations(Astro.currentLocale).siteMenu;
+const locale = Astro.currentLocale;
+---
+
+<dialog id="site-menu" class="site-menu" aria-label={t.label} tabindex="-1" data-site-menu data-lenis-prevent>
+  <div class="site-menu_panel">
+    <div class="site-menu_bar">
+      <div class="mobile-only">
+        <a href={localePath('/', locale)} class="site-menu_logo">
+          <Logo loading="eager" />
+        </a>
+      </div>
+      <div class="mobile-hide">
+        <div class="flex-h align-center spacing-12">
+          <Button href={site.signUpUrl} variant="ghost" size="sm" target="_blank" rel="noopener noreferrer">{t.login}</Button>
+          <Button href={site.signUpUrl} size="sm" target="_blank" rel="noopener noreferrer">{t.register}</Button>
+        </div>
+      </div>
+      <button type="button" class="site-menu_close" aria-label={t.close} data-menu-close>
+        <IconClose class="site-menu_close-icon" aria-hidden="true" />
+      </button>
+    </div>
+    <nav class="site-menu_nav text-weight-400" aria-label={t.navLabel}>
+      <ul class="flex-v spacing-40/40/24 text-size-h3">
+        {
+          items.map((item) => (
+            <li class="site-menu_item">
+              <NavLink href={item.href} class="site-menu_link spacing-16/16/12">
+                <span class="site-menu_dot" aria-hidden="true" />
+                {item.label}
+              </NavLink>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <div class="site-menu_bottom">
+      <div class="mobile-only">
+        <div class="flex-v spacing-20">
+          <Button href={site.signUpUrl} variant="secondary" target="_blank" rel="noopener noreferrer">{t.login}</Button>
+          <Button href={site.signUpUrl} target="_blank" rel="noopener noreferrer">{t.register}</Button>
+        </div>
+      </div>
+      <div class="mobile-hide">
+        <div class="flex-v">
+          <Button href={site.signUpUrl} target="_blank" rel="noopener noreferrer">{t.cta}</Button>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  // Open: showModal → focus the dialog (not the ×) → commit the hidden state → is--open (the transitions run).
+  // Close: is--open off → wait for the transitions → close(). The header's toggle keeps aria-expanded and
+  // menu:toggle is dispatched for header.ts / motion.ts.
+  const dialog = document.querySelector<HTMLDialogElement>('[data-site-menu]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  if (dialog && toggle) {
+    const setExpanded = (open: boolean) => {
+      if (toggle.getAttribute('aria-expanded') === String(open)) return;
+      toggle.setAttribute('aria-expanded', String(open));
+      document.dispatchEvent(new CustomEvent('menu:toggle', { detail: { open } }));
+    };
+
+    const open = () => {
+      if (dialog.open) return;
+      dialog.showModal();
+      dialog.focus();
+      dialog.getBoundingClientRect();
+      dialog.classList.add('is--open');
+      setExpanded(true);
+    };
+
+    const close = async () => {
+      if (!dialog.classList.contains('is--open')) return;
+      dialog.classList.remove('is--open');
+      setExpanded(false);
+      await Promise.allSettled(dialog.getAnimations({ subtree: true }).map((animation) => animation.finished));
+      if (!dialog.classList.contains('is--open')) dialog.close();
+    };
+
+    toggle.addEventListener('click', open);
+    dialog.addEventListener('cancel', (event) => {
+      event.preventDefault();
+      void close();
+    });
+    // a close the browser forces
+    dialog.addEventListener('close', () => {
+      dialog.classList.remove('is--open');
+      setExpanded(false);
+    });
+    dialog.addEventListener('click', (event) => {
+      // a click outside the panel lands on the dialog itself (its ::backdrop)
+      if (event.target === dialog) {
+        void close();
+        return;
+      }
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest('[data-menu-close]')) {
+        void close();
+        return;
+      }
+      const link = target?.closest<HTMLAnchorElement>('a[href]');
+      if (!link || !dialog.open) return;
+      const url = new URL(link.href);
+      const samePageAnchor = url.origin === location.origin && url.pathname === location.pathname && url.hash !== '';
+      const plainClick = event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+      if (samePageAnchor && plainClick) {
+        // the page behind is locked while the menu is open: close first, then follow the link (motion.ts scrolls)
+        event.preventDefault();
+        void close().then(() => requestAnimationFrame(() => link.click()));
+      } else {
+        void close();
+      }
+    });
+    window.matchMedia('(min-width: 992px)').addEventListener('change', (event) => {
+      if (event.matches) void close();
+    });
+  }
+</script>
+
+<style>
+  /* the dialog: no display of its own (the UA hides the closed one); layout lives on .site-menu_panel */
+  .site-menu {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    color: var(--theme-text);
+    /* mobile 28:8990: Background under a navy gradient */
+    background: linear-gradient(rgb(4 13 41 / 0.25), rgb(4 13 41)), var(--theme-page-bg);
+    /* hidden: rolled up to the top edge */
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path var(--transition-duration) var(--transition-easing);
+  }
+  .site-menu.is--open {
+    clip-path: inset(0);
+  }
+  .site-menu:focus-visible {
+    outline: none;
+  }
+  /* 36:1198: the page behind, darkened and blurred */
+  .site-menu::backdrop {
+    background-color: var(--theme-menu-backdrop);
+    -webkit-backdrop-filter: blur(var(--size-30));
+    backdrop-filter: blur(var(--size-30));
+    opacity: 0;
+    transition: opacity var(--transition-duration) var(--transition-easing);
+  }
+  .site-menu.is--open::backdrop {
+    opacity: 1;
+  }
+
+  .site-menu_panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--size-48);
+    min-height: 100%;
+    padding-bottom: var(--size-48);
+  }
+
+  /* the rows rise in one after another (--step, half a stagger apart), all leave together */
+  .site-menu_bar,
+  .site-menu_item,
+  .site-menu_bottom {
+    opacity: 0;
+    translate: 0 var(--size-16);
+    transition:
+      opacity var(--transition-duration) var(--transition-easing),
+      translate var(--transition-duration) var(--transition-easing);
+  }
+  .site-menu.is--open .site-menu_bar,
+  .site-menu.is--open .site-menu_item,
+  .site-menu.is--open .site-menu_bottom {
+    opacity: 1;
+    translate: none;
+    transition-delay: calc(var(--transition-stagger) * var(--step) / 2);
+  }
+  .site-menu_bar {
+    --step: 1;
+  }
+  .site-menu_item {
+    --step: 2;
+  }
+  .site-menu_item:nth-child(2) {
+    --step: 3;
+  }
+  .site-menu_item:nth-child(3) {
+    --step: 4;
+  }
+  .site-menu_item:nth-child(4) {
+    --step: 5;
+  }
+  .site-menu_item:nth-child(n + 5) {
+    --step: 6;
+  }
+  .site-menu_bottom {
+    --step: 7;
+  }
+
+  .site-menu_bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-20);
+    padding: var(--size-24) var(--container-padding);
+    /* #1e2e4a at 100 % (the Border Color variable is 40 %) */
+    border-bottom: 1px solid rgb(30 46 74);
+  }
+  .site-menu_logo {
+    display: flex;
+    transition: opacity var(--transition-duration) var(--transition-easing);
+  }
+  .site-menu_logo:hover,
+  .site-menu_logo:focus-visible {
+    opacity: 0.7;
+  }
+  /* "32px / Menu" ×: Text Secondary, turns in */
+  .site-menu_close {
+    display: flex;
+    color: var(--theme-icon-secondary);
+    transition: color var(--transition-duration) var(--transition-easing);
+  }
+  .site-menu_close:hover,
+  .site-menu_close:focus-visible {
+    color: var(--theme-icon);
+  }
+  .site-menu_close-icon {
+    width: var(--size-36);
+    height: var(--size-36);
+    rotate: -90deg;
+    transition: rotate var(--transition-duration) var(--transition-easing);
+  }
+  .site-menu.is--open .site-menu_close-icon {
+    rotate: none;
+    transition-delay: calc(var(--transition-stagger) / 2);
+  }
+
+  .site-menu_nav {
+    flex: auto;
+    padding-inline: var(--container-padding);
+  }
+  .spacing-40\/40\/24 {
+    gap: var(--size-40);
+  }
+  .spacing-16\/16\/12 {
+    gap: var(--size-16);
+  }
+  .spacing-12 {
+    gap: var(--size-12);
+  }
+  /* the <a> is NavLink's (.nav-link: nav size, Text Secondary, Accent Yellow when current): the parent in the
+     selector outranks those rules; the text style comes from the list (text-size-h3, text-weight-400) */
+  .site-menu_nav .site-menu_link {
+    display: flex;
+    align-items: center;
+    color: var(--theme-text-tertiary);
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+    white-space: normal;
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 0.2em;
+    transition:
+      color var(--transition-duration) var(--transition-easing),
+      text-decoration-color var(--transition-duration) var(--transition-easing);
+  }
+  .site-menu_nav .site-menu_link:hover,
+  .site-menu_nav .site-menu_link:focus-visible {
+    color: var(--theme-text);
+  }
+  .site-menu_nav .site-menu_link[aria-current] {
+    color: var(--theme-text);
+    font-weight: var(--font-weight-medium);
+    text-decoration-color: currentColor;
+  }
+  .site-menu_dot {
+    flex: none;
+    width: var(--size-8);
+    height: var(--size-8);
+    border-radius: var(--radius-full);
+    background-color: var(--theme-menu-marker);
+    transition:
+      background-color var(--transition-duration) var(--transition-easing),
+      scale var(--transition-duration) var(--transition-easing);
+  }
+  .site-menu_link:hover .site-menu_dot,
+  .site-menu_link:focus-visible .site-menu_dot {
+    scale: 1.5;
+  }
+  .site-menu_link[aria-current] .site-menu_dot {
+    background-color: var(--theme-menu-marker-active);
+  }
+
+  .site-menu_bottom {
+    padding-inline: var(--container-padding);
+  }
+
+  /* tablet 34:13718: a 460 panel on the right, sliding in */
+  @media (min-width: 480px) {
+    .site-menu {
+      width: calc(28.75rem * var(--fluid-scale));
+      margin-left: auto;
+      border: 1px solid var(--theme-border);
+      border-right: 0;
+      border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+      background: var(--theme-surface-tint), var(--theme-page-bg);
+      clip-path: none;
+      translate: 100% 0;
+      transition: translate var(--transition-duration) var(--transition-easing);
+    }
+    .site-menu.is--open {
+      translate: none;
+    }
+    .site-menu_panel {
+      padding-bottom: var(--size-40);
+    }
+    /* the rows come in from the right, after the panel */
+    .site-menu_bar,
+    .site-menu_item,
+    .site-menu_bottom {
+      translate: var(--size-24) 0;
+    }
+    /* on the header's line: 73 tall like tablet-header, the buttons and × where the header has them */
+    .site-menu_bar {
+      justify-content: flex-end;
+      min-height: var(--header-height);
+      padding-block: 0;
+    }
+  }
+
+  /* mobile 28:8990 */
+  @media (max-width: 479px) {
+    .spacing-40\/40\/24 {
+      gap: var(--size-24);
+    }
+    .spacing-16\/16\/12 {
+      gap: var(--size-12);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-menu.is--open .site-menu_bar,
+    .site-menu.is--open .site-menu_item,
+    .site-menu.is--open .site-menu_bottom,
+    .site-menu.is--open .site-menu_close-icon {
+      transition-delay: 0s;
+    }
+  }
+</style>

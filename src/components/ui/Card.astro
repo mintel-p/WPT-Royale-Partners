@@ -1,0 +1,208 @@
+---
+/**
+ * Card — the card frame repeated by how-it-works ("step-card") and benefits / commissions ("benefit-card"):
+ * radius 32, padding 32 from the outer edge (Figma strokes inside: the 1.5 border is part of it), 1.5 stroke, a blurred blue glow (Ellipse 2258, plus-lighter) clipped by the card.
+ *   type     default (fill #8e9bb4 3 %, Border Color, glow top-left)
+ *            step (Background fill + a 20 % conic blue layer + inner shadows, Accent Yellow 25 % stroke, glow bottom-left)
+ *            cta  (final CTA 2064:2130: the step background with its first inner shadow only, Border Color stroke,
+ *                 padding 64 / 56; its blurred glows are part of FinalCta's background picture)
+ *   size     md · sm (benefits: tablet padding 24, radius 20 — the same as md on desktop)
+ *   element  div · li · article
+ * Tablet: padding 28 (--card-padding), radius 24 (--radius-xl); cta 56 / 40. The glow is its own ellipse there
+ * (2045:2016): step 280 × 110 (2045:2073), default sm 269.8 × 160 at 17.22° (benefits 2045:2100), default md
+ * 200 × 603.5 at 81.1°, blur 300 (commissions 2045:3221); cta keeps its glow under the tablet background picture.
+ * Mobile (2053:3503): radius 20; padding 20 (step, sm) or 24 / 20 (default md, cta). Its own ellipses again:
+ * step 250 × 100 at 26.69° (2053:3567), default sm 240 × 126.29 at 17.22°, blur 200 (benefits 2053:3592),
+ * default md 150 × 400 at 81.1°, blur 300 (commissions 2053:4706).
+ * The content's own layout (gaps, alignment) is the caller's wrapper in the slot.
+ */
+import { Image } from 'astro:assets';
+import type { HTMLAttributes } from 'astro/types';
+import glow from '@/assets/decor/card-glow.svg';
+import glowSmall from '@/assets/decor/card-glow-sm.svg';
+import glowStep from '@/assets/decor/card-glow-step.svg';
+import glowStepSmall from '@/assets/decor/card-glow-step-sm.svg';
+import glowStepMobile from '@/assets/decor/card-glow-step-xs.svg';
+import glowWide from '@/assets/decor/card-glow-wide.svg';
+import glowWideMobile from '@/assets/decor/card-glow-wide-xs.svg';
+import glowSmallMobile from '@/assets/decor/card-glow-xs.svg';
+
+type Props = HTMLAttributes<'div'> & { type?: 'default' | 'step' | 'cta'; size?: 'md' | 'sm'; element?: 'div' | 'li' | 'article' };
+const { type = 'default', size = 'md', element: Element = 'div', class: className, ...rest } = Astro.props;
+// cta: no glow of its own — FinalCta covers the card with the background picture exported from Figma
+const glowSrc = { default: glow, step: glowStep, cta: undefined }[type];
+// tablet ellipse: a picture of its own, shown instead of the desktop one at ≤ 991
+const tabletGlowSrc = type === 'step' ? glowStepSmall : type === 'default' ? (size === 'sm' ? glowSmall : glowWide) : undefined;
+// mobile ellipse: one more picture of its own at ≤ 479
+const mobileGlowSrc = type === 'step' ? glowStepMobile : type === 'default' ? (size === 'sm' ? glowSmallMobile : glowWideMobile) : undefined;
+---
+
+<Element class:list={['card', type !== 'default' && `type--${type}`, size === 'sm' && 'size--sm', className]} {...rest}>
+  {
+    glowSrc && tabletGlowSrc && mobileGlowSrc && (
+      <>
+        <div class="desktop-only">
+          <Image src={glowSrc} alt="" layout="none" class="card_glow" aria-hidden="true" />
+        </div>
+        <div class="desktop-hide">
+          <div class="mobile-hide">
+            <Image src={tabletGlowSrc} alt="" layout="none" class="card_tablet-glow" aria-hidden="true" />
+          </div>
+        </div>
+        <div class="mobile-only">
+          <Image src={mobileGlowSrc} alt="" layout="none" class="card_mobile-glow" aria-hidden="true" />
+        </div>
+      </>
+    )
+  }
+  <slot />
+</Element>
+
+<style>
+  .card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: calc(var(--card-padding) - var(--border-width-sm));
+    border: var(--border-width-sm) solid var(--theme-border);
+    border-radius: var(--radius-xl);
+    background-color: var(--theme-card-bg);
+  }
+  /* negative z-index inside the isolated card: above its background, below the content */
+  .card_glow {
+    position: absolute;
+    top: calc(-20.932rem * var(--fluid-scale));
+    left: calc(-21.549rem * var(--fluid-scale));
+    z-index: -1;
+    width: calc(46.405rem * var(--fluid-scale));
+    max-width: none;
+    height: calc(43.58rem * var(--fluid-scale));
+    mix-blend-mode: plus-lighter;
+    transform: rotate(26.69deg);
+    pointer-events: none;
+  }
+
+  /* step + cta share the background and the blue inner shadow (Figma rect "Rectangle 21611184") */
+  .card.type--step,
+  .card.type--cta {
+    --card-inner-glow: inset 0 calc(-0.5rem * var(--fluid-scale)) calc(2.1875rem * var(--fluid-scale)) rgb(26 25 118 / 0.3);
+    background-color: var(--theme-page-bg);
+    box-shadow: var(--card-inner-glow);
+  }
+  .card.type--step {
+    border-color: var(--theme-card-border-brand);
+    box-shadow:
+      var(--card-inner-glow),
+      inset 0 0 calc(0.9375rem * var(--fluid-scale)) rgb(0 0 0 / 0.25);
+  }
+  .card.type--step::before,
+  .card.type--cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: conic-gradient(
+      from 180deg,
+      rgb(20 22 173 / 0.6) -7.55%,
+      rgb(20 22 173 / 0.3) 14.42%,
+      rgb(49 69 196 / 0.325) 19.69%,
+      rgb(78 115 218 / 0.35) 24.96%,
+      rgb(50 88 189 / 0.2) 42.96%,
+      rgb(23 61 161 / 0.05) 60.97%,
+      rgb(22 42 167 / 0.325) 76.71%,
+      rgb(20 22 173 / 0.6) 92.45%
+    );
+    opacity: 0.2;
+  }
+  .card.type--step .card_glow {
+    top: calc(-1.539rem * var(--fluid-scale));
+    left: calc(-23.691rem * var(--fluid-scale));
+    width: calc(51.18rem * var(--fluid-scale));
+    height: calc(39.16rem * var(--fluid-scale));
+  }
+
+  .card.type--cta {
+    padding: calc(var(--size-64) - var(--border-width-sm)) calc(var(--size-56) - var(--border-width-sm));
+  }
+
+  /* tablet ellipses, centred on the Figma ellipse (the card's outer box, so 1.5 less for the border) */
+  .card_tablet-glow {
+    position: absolute;
+    top: calc(-42.55rem * var(--fluid-scale));
+    left: calc(-12.056rem * var(--fluid-scale));
+    z-index: -1;
+    width: calc(50rem * var(--fluid-scale));
+    max-width: none;
+    height: calc(75.218rem * var(--fluid-scale));
+    mix-blend-mode: plus-lighter;
+    transform: rotate(81.1deg);
+    pointer-events: none;
+  }
+  .card.size--sm .card_tablet-glow {
+    top: calc(-21.197rem * var(--fluid-scale));
+    left: calc(-19.678rem * var(--fluid-scale));
+    width: calc(48.113rem * var(--fluid-scale));
+    height: calc(41.25rem * var(--fluid-scale));
+    transform: rotate(17.22deg);
+  }
+  .card.type--step .card_tablet-glow {
+    top: calc(-4.653rem * var(--fluid-scale));
+    left: calc(-21.944rem * var(--fluid-scale));
+    width: calc(48.75rem * var(--fluid-scale));
+    height: calc(38.125rem * var(--fluid-scale));
+    transform: rotate(26.69deg);
+  }
+
+  /* mobile ellipses, centred on the Figma ellipse (the card's outer box, so 1.5 less for the border):
+     default md 750 × 1000 around (113.99, −44.97), sm 640 × 527 around (−3.62, −14.16), step 750 × 600 around (29.22, 200.82) */
+  .card_mobile-glow {
+    position: absolute;
+    top: calc(-34.1543rem * var(--fluid-scale));
+    left: calc(-16.4069rem * var(--fluid-scale));
+    z-index: -1;
+    width: calc(46.875rem * var(--fluid-scale));
+    max-width: none;
+    height: calc(62.5rem * var(--fluid-scale));
+    mix-blend-mode: plus-lighter;
+    transform: rotate(81.1deg);
+    pointer-events: none;
+  }
+  .card.size--sm .card_mobile-glow {
+    top: calc(-17.4256rem * var(--fluid-scale));
+    left: calc(-20.32rem * var(--fluid-scale));
+    width: calc(40rem * var(--fluid-scale));
+    height: calc(32.9375rem * var(--fluid-scale));
+    transform: rotate(17.22deg);
+  }
+  .card.type--step .card_mobile-glow {
+    top: calc(-6.2925rem * var(--fluid-scale));
+    left: calc(-21.705rem * var(--fluid-scale));
+    width: calc(46.875rem * var(--fluid-scale));
+    height: calc(37.5rem * var(--fluid-scale));
+    transform: rotate(26.69deg);
+  }
+
+  @media (max-width: 991px) {
+    /* tablet / mobile step cards (2064:4863, 2064:3540): one inner shadow */
+    .card.type--step {
+      box-shadow: inset 0 calc(-0.5rem * var(--fluid-scale)) calc(2.8125rem * var(--fluid-scale)) rgb(26 25 118 / 0.4);
+    }
+    .card.size--sm {
+      padding: calc(var(--size-24) - var(--border-width-sm));
+      border-radius: var(--radius-md);
+    }
+    .card.type--cta {
+      padding: calc(var(--size-56) - var(--border-width-sm)) calc(var(--size-40) - var(--border-width-sm));
+    }
+  }
+  @media (max-width: 479px) {
+    .card,
+    .card.type--cta {
+      padding: calc(var(--size-24) - var(--border-width-sm)) calc(var(--card-padding) - var(--border-width-sm));
+    }
+    .card.type--step,
+    .card.size--sm {
+      padding: calc(var(--card-padding) - var(--border-width-sm));
+    }
+  }
+</style>

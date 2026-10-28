@@ -1,0 +1,56 @@
+// wrangler.jsonc of a client project: the static dist/ built by `pnpm build` plus one Worker (worker/index.ts) that
+// handles the site forms — `POST /api/form` → D1 + Telegram (+ e-mail); every other URL is served from the assets.
+// Before the first deploy set `account_id` (your Cloudflare account) and the domains in `routes` — see README.md.
+// Deployed to the client's Cloudflare account by GitHub Actions (.github/workflows/deploy.yml) with the project's own
+// wrangler and the API token in the repository secret CLOUDFLARE_API_TOKEN — no Workers Builds, no GitHub App:
+//   `main`  → production Worker `<name>` (`wrangler deploy --env=""`)
+//   `stage` → Worker `<name>-stage` (`wrangler deploy --env stage`), D1 migrations applied before every deploy
+// Local: `pnpm worker` (wrangler dev on :8787, `pnpm dev` proxies /api to it), secrets in .dev.vars (gitignored),
+// the local D1 needs `pnpm worker:migrate` once.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "wpt-royal-partners",
+  "account_id": "<YOUR_CLOUDFLARE_ACCOUNT_ID>",
+  "compatibility_date": "2026-10-08",
+  "main": "worker/index.ts",
+  // Production domain (zone in the client's account); Cloudflare creates the DNS record and certificate
+  "routes": [{ "pattern": "wpt-royal-partners.site", "custom_domain": true }],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // only /api/* reaches the Worker before the assets; unknown URLs get dist/404.html with a 404 status
+    "run_worker_first": ["/api/*"],
+    "not_found_handling": "404-page",
+  },
+  // Plain settings read by the Worker as `env.*`. Secrets — TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID,
+  // TELEGRAM_WEBHOOK_SECRET — are set with `wrangler secret put`, never here.
+  // NOTIFY: `telegram`, `email` or `telegram,email`. E-mail (Cloudflare Email Service) needs the Workers Paid plan:
+  // add `send_email: [{ "name": "EMAIL" }]` + vars EMAIL_FROM / EMAIL_TO, or a Resend channel in worker/index.ts.
+  "vars": {
+    "ENVIRONMENT": "production",
+    "NOTIFY": "telegram",
+    "SITE_NAME": "wpt-royal-partners.site",
+  },
+  // No forms yet: `d1_databases` and `ratelimits` are added when the forms are connected (the Worker treats /api/* as unknown until then)
+  "env": {
+    // Worker `<name>-stage`, deployed from the `stage` branch by the workflow with `wrangler deploy --env stage`.
+    // Bindings and vars are not inherited from the top level, so everything is repeated here.
+    "stage": {
+      // own domain; without it the stage Worker would inherit the production domain
+      // not deployed while the project has no `stage` branch
+      "routes": [{ "pattern": "stage.wpt-royal-partners.site", "custom_domain": true }],
+      // every request goes through the Worker: it adds `X-Robots-Tag: noindex` and a closed robots.txt on stage
+      "assets": {
+        "directory": "./dist",
+        "binding": "ASSETS",
+        "run_worker_first": true,
+        "not_found_handling": "404-page",
+      },
+      "vars": {
+        "ENVIRONMENT": "stage",
+        "NOTIFY": "telegram",
+        "SITE_NAME": "wpt-royal-partners.site",
+      },
+    },
+  },
+}

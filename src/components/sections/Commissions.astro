@@ -1,0 +1,107 @@
+---
+/**
+ * Commissions — Figma Desktop 0:1417 ("commissions"): section header + three partnership model cards
+ * (ui/Card, 320 tall, gap 24) with a brand pill (ui/Tag), title, text, divider and the sign-up button.
+ * Tablet 2039:1748: the cards stack in the centred 580 column (gap 16), every gap inside 24, the text 380 wide;
+ * the striped glow mirrored at the top-right, from 168 above the section (ui/SectionGlow type="mirrored", tablet and mobile).
+ * Mobile 2053:4699: cards 12 apart, padding 24 / 20, every gap inside 20, the text the full 318.
+ */
+import Button from '@/components/ui/Button.astro';
+import Card from '@/components/ui/Card.astro';
+import SectionGlow from '@/components/ui/SectionGlow.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import Tag from '@/components/ui/Tag.astro';
+import { site } from '@/data/site';
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  models?: { tag: string; title: string; text: string }[];
+  cta?: string;
+  ctaHref?: string;
+}
+
+const t = useTranslations(Astro.currentLocale).commissions;
+const { eyebrow = t.eyebrow, title = t.title, models = t.models, cta = t.cta, ctaHref = site.signUpUrl } = Astro.props;
+---
+
+<section class="section padding-md" id="commission-models" aria-labelledby="commission-models-title">
+  <div class="desktop-hide">
+    <SectionGlow type="mirrored" />
+  </div>
+  <div class="container">
+    <div class="flex-v spacing-2xl">
+      <SectionHeader eyebrow={eyebrow} title={title} headingId="commission-models-title" data-reveal />
+      <ul class="commissions_list grid-3/1/1col spacing-24/16/12" data-reveal="stagger">
+        {
+          models.map((model) => (
+            <Card element="li">
+              <div class="flex-v spacing-32/24/20 commissions_body">
+                <div>
+                  <Tag>{model.tag}</Tag>
+                </div>
+                <div class="flex-v spacing-xs commissions_text">
+                  <h3 class="text-size-h3 text-weight-800">{model.title}</h3>
+                  <p class="text-color-secondary">{model.text}</p>
+                </div>
+                <div class="commissions_divider" aria-hidden="true"></div>
+                <Button variant="secondary" href={ctaHref} target="_blank" rel="noopener noreferrer">{cta}</Button>
+              </div>
+            </Card>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .spacing-24\/16\/12 {
+    gap: var(--size-24);
+  }
+  .spacing-32\/24\/20 {
+    gap: var(--size-32);
+  }
+  /* the card is 320 tall in the frame: 320 − 2 × 32 padding (border included) */
+  .commissions_body {
+    min-height: calc(16rem * var(--fluid-scale));
+  }
+  .commissions_divider {
+    height: var(--size-1);
+    background-color: var(--theme-border-strong);
+  }
+
+  @media (max-width: 991px) {
+    .commissions_list {
+      width: 100%;
+      max-width: calc(36.25rem * var(--fluid-scale));
+      margin-inline: auto;
+    }
+    .spacing-24\/16\/12 {
+      gap: var(--size-16);
+    }
+    .spacing-32\/24\/20 {
+      gap: var(--size-24);
+    }
+    /* the card hugs its content (277) */
+    .commissions_body {
+      min-height: 0;
+    }
+    .commissions_text {
+      max-width: calc(23.75rem * var(--fluid-scale));
+    }
+  }
+
+  @media (max-width: 479px) {
+    .spacing-24\/16\/12 {
+      gap: var(--size-12);
+    }
+    .spacing-32\/24\/20 {
+      gap: var(--size-20);
+    }
+    .commissions_text {
+      max-width: none;
+    }
+  }
+</style>

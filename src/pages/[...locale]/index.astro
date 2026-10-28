@@ -1,0 +1,46 @@
+---
+import Hero from '@/components/sections/Hero.astro';
+import Benefits from '@/components/sections/Benefits.astro';
+import HowItWorks from '@/components/sections/HowItWorks.astro';
+import OntarioBanner from '@/components/sections/OntarioBanner.astro';
+import ResponsibleGaming from '@/components/sections/ResponsibleGaming.astro';
+import Commissions from '@/components/sections/Commissions.astro';
+import Faq from '@/components/sections/Faq.astro';
+import FinalCta from '@/components/sections/FinalCta.astro';
+import SiteFooter from '@/components/sections/SiteFooter.astro';
+import SiteHeader from '@/components/sections/SiteHeader.astro';
+import type { SchemaNode } from '@/data/schema';
+import { localeStaticPaths, useTranslations } from '@/i18n';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+export const getStaticPaths = localeStaticPaths;
+
+const dict = useTranslations(Astro.currentLocale);
+const t = dict.pages.home;
+
+// The FAQ section shows full questions and answers: FAQPage with the same texts (visible content only)
+const pageUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
+const faqNode: SchemaNode = {
+  '@type': 'FAQPage',
+  '@id': `${pageUrl}#faq`,
+  isPartOf: { '@id': `${pageUrl}#webpage` },
+  mainEntity: dict.faq.items.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
+---
+
+<BaseLayout title={t.title} description={t.description} ogImage="/og/home.jpg" schema={{ nodes: [faqNode] }} motion>
+  <SiteHeader slot="header" />
+  <Hero />
+  <HowItWorks />
+  <Benefits />
+  <OntarioBanner />
+  <Commissions />
+  <Faq />
+  <FinalCta />
+  <ResponsibleGaming />
+  <SiteFooter slot="footer" />
+</BaseLayout>

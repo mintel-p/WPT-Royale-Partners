@@ -1,0 +1,174 @@
+---
+/**
+ * SiteFooter — Figma footer 0:1515 (UI kit 0:21): brand (logo + the site description), two link
+ * columns, the bottom row (regulator line + copyright). Rendered through <BaseLayout> slot="footer":
+ * the layout owns <footer class="footer"> (padding 80 / 40, background; tablet 56 / 32).
+ * Tablet "tablet-footer" 2039:1859: logo | description, then the two columns (each half, gap 48), a
+ * full-width divider and the two bottom lines stacked (gap 8); rows 48 apart.
+ * Mobile "mobile-footer" 2053:4797 (padding 32 / 32): the logo (36 tall) over the description (gap 16, text 13), the two
+ * columns side by side (gap 32; title → links and links 24 apart, titles 11), the bottom lines 6 apart.
+ */
+import Logo from '@/components/ui/Logo.astro';
+import NavLink from '@/components/ui/NavLink.astro';
+import { site } from '@/data/site';
+import { localePath, localized, useTranslations } from '@/i18n';
+
+const t = useTranslations(Astro.currentLocale).siteFooter;
+const locale = Astro.currentLocale;
+const owner = site.legalName || localized(site.name, locale);
+---
+
+<div class="container">
+  <div class="flex-v spacing-3xl">
+    <div class="flex-h/v/v justify-space-between spacing-4xl">
+      <div class="site-footer_brand spacing-24/48/16">
+        <div class="site-footer_half">
+          <div class="mobile-hide">
+            <Logo size="lg" />
+          </div>
+          <div class="mobile-only">
+            <Logo />
+          </div>
+        </div>
+        <div class="site-footer_half text-size-15/14/13 text-color-secondary">
+          <p>{localized(site.schema.description, locale)}</p>
+        </div>
+      </div>
+      <nav aria-label={t.navLabel} class="site-footer_nav flex-h spacing-80/48/32">
+        {
+          t.columns.map((column, index) => (
+            <div class="site-footer_column flex-v spacing-20/16/24">
+              <div class="text-color-brand">
+                <p id={`footer-column-${index + 1}`} class="text-size-label text-weight-800 text-style-uppercase">
+                  {column.title}
+                </p>
+              </div>
+              <ul class="flex-v align-start spacing-20/16/24" aria-labelledby={`footer-column-${index + 1}`}>
+                {column.links.map((link) => (
+                  <li>
+                    <NavLink href={'href' in link && link.href ? localePath(link.href, locale) : undefined}>{link.label}</NavLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </nav>
+    </div>
+    <div class="desktop-hide">
+      <div class="site-footer_divider" aria-hidden="true"></div>
+    </div>
+    <div class="text-size-13/12/12 text-color-secondary">
+      <div class="flex-h/v/v justify-space-between spacing-md/8/6">
+        <p>{t.registered}</p>
+        <p>© {site.copyrightYear} {owner}. {t.rights}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .site-footer_brand {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: calc(20rem * var(--fluid-scale));
+  }
+  .site-footer_half {
+    display: flex;
+  }
+  .site-footer_nav {
+    width: calc(31.375rem * var(--fluid-scale));
+  }
+  .site-footer_column {
+    width: var(--size-160);
+  }
+  .spacing-24\/48\/16 {
+    gap: var(--size-24);
+  }
+  .spacing-80\/48\/32 {
+    gap: var(--size-80);
+  }
+  .spacing-20\/16\/24 {
+    gap: var(--size-20);
+  }
+  .spacing-md\/8\/6 {
+    gap: var(--spacing-md);
+  }
+  /* bottom lines: Poppins Regular 13 on desktop, 12 on tablet and mobile, line height auto everywhere */
+  .text-size-13\/12\/12 {
+    font-size: var(--font-caption);
+    line-height: 1.5;
+    letter-spacing: var(--letter-spacing-caption);
+  }
+  /* footer brand paragraph: Poppins Regular 15/130 % (14 on tablet, 13 on mobile), the only use */
+  .text-size-15\/14\/13 {
+    font-size: var(--size-15);
+    line-height: 1.3;
+    letter-spacing: 0;
+  }
+
+  @media (max-width: 991px) {
+    /* logo | description, each half of the column */
+    .site-footer_brand {
+      flex-direction: row;
+      width: 100%;
+    }
+    .site-footer_half {
+      flex: 1;
+    }
+    .site-footer_nav {
+      width: 100%;
+    }
+    .site-footer_column {
+      flex: 1;
+      width: auto;
+    }
+    .spacing-24\/48\/16 {
+      gap: var(--size-48);
+    }
+    .spacing-80\/48\/32 {
+      gap: var(--size-48);
+    }
+    .spacing-20\/16\/24 {
+      gap: var(--size-16);
+    }
+    .spacing-md\/8\/6 {
+      gap: var(--size-8);
+    }
+    .text-size-15\/14\/13 {
+      font-size: var(--size-14);
+    }
+    /* "divider" 2039:1879: #1e2e4a 60 %, the full frame width */
+    .site-footer_divider {
+      height: var(--size-1);
+      margin-inline: calc(var(--container-padding) * -1);
+      background-color: var(--theme-border-strong);
+    }
+  }
+
+  @media (max-width: 479px) {
+    /* the logo over the description */
+    .site-footer_brand {
+      flex-direction: column;
+    }
+    .site-footer_half {
+      flex: none;
+    }
+    .spacing-24\/48\/16 {
+      gap: var(--size-16);
+    }
+    .spacing-80\/48\/32 {
+      gap: var(--size-32);
+    }
+    .spacing-20\/16\/24 {
+      gap: var(--size-24);
+    }
+    .spacing-md\/8\/6 {
+      gap: var(--size-6);
+    }
+    .text-size-15\/14\/13 {
+      font-size: var(--size-13);
+    }
+  }
+</style>

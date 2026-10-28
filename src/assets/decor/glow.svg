@@ -1,0 +1,16 @@
+<svg width="1008" height="985" viewBox="-220 0 1008 985" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#glow-blur)">
+<path d="M0 332.035C36 281.535 117.4 182.235 131 235.035C148 301.035 -10 386.535 78.5 369.535C167 352.535 624.787 235.401 398.5 397.035C52 644.535 628.728 514.142 561.5 605.363C308.348 948.868 169.179 642.024 139.223 558.453C141.183 565.395 143.609 574.34 146.5 585.535C193.7 768.335 90.3333 768.864 0 717.363V332.035Z" fill="url(#glow-gradient)" fill-opacity="0.08"/>
+</g>
+<defs>
+<filter id="glow-blur" x="-220" y="0" width="1007.01" height="984.545" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="110" result="effect1_foregroundBlur-benefits-glow"/>
+</filter>
+<linearGradient id="glow-gradient" x1="576.059" y1="446.437" x2="0" y2="446.437" gradientUnits="userSpaceOnUse">
+<stop stop-color="#5F0092"/>
+<stop offset="1" stop-color="#0B50FF"/>
+</linearGradient>
+</defs>
+</svg>

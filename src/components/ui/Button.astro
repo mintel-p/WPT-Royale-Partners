@@ -1,0 +1,115 @@
+---
+/**
+ * Button — Figma components "Huge Primary button", "Huge Secondary button", "Small Button".
+ *   variant  primary (green gradient) · secondary (outline, hover blue) · ghost (text only: header Login; hover = the secondary outline)
+ *   size     md (Huge: 48 tall, min 202 wide) · sm (Small: 40 tall, min 120 wide)
+ * `href` → <a>, otherwise <button type="button">; every other attribute passes through.
+ * target="_blank" adds the sr-only hint `button.newTab` from the dictionary ("opens in a new tab").
+ * States from the UI kit: hover = focus-visible ("On Hower"), disabled / aria-disabled ("Disable", 40 %).
+ */
+import type { HTMLAttributes } from 'astro/types';
+import { useTranslations } from '@/i18n';
+
+type Own = { variant?: 'primary' | 'secondary' | 'ghost'; size?: 'md' | 'sm' };
+type Props = Own & ((HTMLAttributes<'a'> & { href: string }) | (HTMLAttributes<'button'> & { href?: never }));
+
+const { variant = 'primary', size = 'md', href, class: className, type, ...rest } = Astro.props;
+const t = useTranslations(Astro.currentLocale).button;
+// a link that opens a new tab says so to screen readers
+const newTab = href && (rest as HTMLAttributes<'a'>).target === '_blank';
+const Tag = href ? 'a' : 'button';
+const buttonType = href ? undefined : ((type ?? 'button') as 'button' | 'submit' | 'reset');
+---
+
+<Tag href={href} type={buttonType} class:list={['button', `type--${variant}`, size === 'sm' && 'size--sm', className]} {...rest}><slot />{newTab && <span class="sr-only"> {t.newTab}</span>}</Tag>
+
+<style>
+  .button {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    height: var(--size-48);
+    min-width: calc(12.625rem * var(--fluid-scale));
+    padding-inline: var(--button-padding-inline);
+    border: var(--border-width-sm) solid transparent;
+    border-radius: var(--radius-full);
+    color: var(--theme-button-primary-text);
+    font-size: var(--font-button-text);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-button-text);
+    letter-spacing: var(--letter-spacing-button-text);
+    white-space: nowrap;
+    transition:
+      color var(--transition-duration) var(--transition-easing),
+      background-color var(--transition-duration) var(--transition-easing),
+      border-color var(--transition-duration) var(--transition-easing),
+      opacity var(--transition-duration) var(--transition-easing);
+  }
+  .button.size--sm {
+    height: var(--size-40);
+    min-width: calc(7.5rem * var(--fluid-scale));
+    padding-inline: var(--button-padding-inline-sm);
+  }
+
+  /* primary: gradients can't transition, so the hover fill + stroke + glow fade in on a layer */
+  .button.type--primary {
+    border: 0;
+    background-image: var(--theme-button-primary-bg);
+    box-shadow: var(--theme-button-primary-glow);
+  }
+  .button.type--primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border: var(--border-width-sm) solid var(--theme-button-primary-border-hover);
+    border-radius: inherit;
+    background: var(--theme-button-primary-bg-hover) padding-box;
+    box-shadow: var(--theme-button-primary-glow-hover);
+    opacity: 0;
+    transition: opacity var(--transition-duration) var(--transition-easing);
+  }
+  .button.type--primary:hover::before,
+  .button.type--primary:focus-visible::before {
+    opacity: 1;
+  }
+  /* Small Button Filled: no glow, a flat hover fill */
+  .button.type--primary.size--sm {
+    box-shadow: none;
+  }
+  .button.type--primary.size--sm::before {
+    border-color: var(--theme-button-primary-border-hover-sm);
+    background: var(--theme-button-primary-bg-hover-sm) padding-box;
+    box-shadow: none;
+  }
+  /* Huge "Variant3": the gradient reversed, no glow */
+  .button.type--primary:not(.size--sm):is(:disabled, [aria-disabled='true']) {
+    background-image: var(--theme-button-primary-bg-disabled);
+    box-shadow: none;
+  }
+
+  .button.type--secondary {
+    border-color: var(--theme-button-secondary-border);
+  }
+  /* ghost "Chost" On Hower (49:1200): the secondary outline + fill, the text stays */
+  .button.type--secondary:hover,
+  .button.type--secondary:focus-visible,
+  .button.type--ghost:hover,
+  .button.type--ghost:focus-visible {
+    border-color: var(--theme-button-secondary-border-hover);
+    background-color: var(--theme-button-secondary-bg-hover);
+  }
+
+  .button.type--ghost {
+    min-width: calc(7.5rem * var(--fluid-scale));
+  }
+
+  .button:disabled,
+  .button[aria-disabled='true'] {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+</style>
